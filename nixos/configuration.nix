@@ -1127,13 +1127,37 @@ in
       cp = "cp -i";
       mv = "mv -i";
       mkdir = "mkdir -p";
-      update = "clear && sudo nixos-rebuild switch";
       ".." = "cd ..";
       cat = "bat";
     };
 
     promptInit = ''
       ${bashColorInit}
+
+      update() {
+        clear
+
+        current_generation=$(readlink /nix/var/nix/profiles/system | sed -E 's/[^-]*-([0-9]+)-link/\1/')
+
+        printf '%b' "''${YELLOW}Updating NixOS generation ''${LIGHTCYAN}''${current_generation}''${RESET}\n\n"
+
+        if ! sudo nixos-rebuild switch; then
+          printf '%b\n' "''${LIGHTRED}Update failed.''${RESET}"
+          return 1
+        fi
+
+        new_generation=$(readlink /nix/var/nix/profiles/system | sed -E 's/[^-]*-([0-9]+)-link/\1/')
+
+        printf '%b' "\n''${YELLOW}Switched to NixOS generation ''${LIGHTCYAN}''${new_generation}''${RESET}\n"
+
+        swaymsg reload
+
+        # Restart Waybar.
+        pkill waybar 2>/dev/null || true
+        nohup waybar --config /etc/waybar/config --style /etc/waybar/style.css >/dev/null 2>&1 &
+
+        printf '%b\n' "''${LIGHTBLUE}Desktop reloaded.''${RESET}"
+      }
 
       DIR="''${BOLD}''${LIGHTGREEN}"
       CMD="''${BOLD}''${LIGHTYELLOW}"
