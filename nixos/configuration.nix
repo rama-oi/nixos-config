@@ -88,41 +88,44 @@ let
       alacritty
       mako
       swaybg
-      imv
       libnotify
-      brightnessctl
       nemo-with-extensions
-      udiskie
+    ];
 
-      wl-clipboard
-      grim
-      slurp
-
+    themes = with pkgs; [
       dracula-theme
       adwaita-icon-theme
       # catppuccin-gtk
       # arc-theme
     ];
 
+    system = with pkgs; [
+      btop
+      fastfetch
+      pombo.desktop.fastfetch
+    ];
+
     office = with pkgs; [
       calcurse
+      yazi
+
       pombo.desktop.calcurse
     ];
 
-    cli = with pkgs; [
+    commandUtils = with pkgs; [
+      brightnessctl
+      udiskie
+      wl-clipboard
+      grim
+      slurp
+
       tree
       jq
       wget
       curl
       unzip
       zip
-      btop
-      fastfetch
       bat
-      yazi
-
-      pombo.script.fastfetchLaunch
-      pombo.desktop.fastfetch
     ];
 
     browsers = with pkgs; [
@@ -186,6 +189,7 @@ let
 
       imagemagick
       darktable
+      imv
 
       # oxipng
       # pngquant
@@ -226,6 +230,7 @@ let
       pombo.script.waybarBluetooth
       pombo.script.waybarCamera
       pombo.script.waybarMicrophone
+      pombo.script.fastfetchLaunch
     ];
   };
 
@@ -395,16 +400,16 @@ let
     app = {
       jaiba = pkgs.rustPlatform.buildRustPackage rec {
         pname = "jaiba";
-        version = "2026.3";
+        version = "2026.4";
 
         src = pkgs.fetchFromGitHub {
-          owner = "pomboverso";
+          owner = "rama-oi";
           repo = "jaiba";
-          rev = "2026.3";
-          hash = "sha256-2IIoF4StIL8xVYOiuym6UZNpj/N6dMTcfxmnlyn80uc=";
+          rev = "2026.4";
+          hash = "sha256-zS2DZDIKU1tO2RlO/le0CE4cmURDurmgo6iFnPPKfsg=";
         };
 
-        cargoHash = "sha256-0qZcNp+ZEgT2RYgeDXx3MTDIQeY8FsGGwqpb0NuntzE=";
+        cargoHash = "sha256-prcEb1A+xHU9w1u1wkp7Q9hMAy7rQ1sey887BMKF4+g=";
 
         postInstall = ''
           install -Dm644 assets/jaiba.desktop \
