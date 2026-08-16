@@ -2,7 +2,9 @@
 
 Just a bunch of things that I think make sense to share about how I keep my configuration organized. Most of these things probably would look better in separate files, but for now I'm enjoying having only one file where I can edit everything.
 
-## Package Organization
+## Overview
+
+### Package Organization
 
 I used to have one long list of packages. Now I can create smaller groups and remember why I installed things in the first place. This also helps me avoid having a million comments explaining why every package is there.
 
@@ -28,7 +30,7 @@ packages = {
 };
 ```
 
-## Loops
+### Loops
 
 Being able to create repetitive structures in the configuration is such a time saver. I used to manually define a few keybindings for switching between workspaces, but now I only need this:
 
@@ -55,7 +57,7 @@ bindsym $mod+Shift+9 move container to workspace number 9
 
 This makes it much easier to change the number of workspaces later without having to manually update every keybinding.
 
-## CSS Parser
+### CSS Parser
 
 I had a situation where there was a lot of CSS scattered throughout the configuration, so having a way to generate CSS from Nix attributes and keep everything consistent sounded like a good idea.
 
@@ -79,7 +81,7 @@ environment.etc."wofi/catppuccin-mocha.css".text = css {
 };
 ```
 
-## Themes
+### Themes
 
 Because there are a lot of styles shared between different modules, like Waybar and Wofi, having a global theme saves me some time. I don't have to define the same colors in multiple places, which also keeps the configuration shorter.
 
@@ -100,7 +102,7 @@ themes = {
 };
 ```
 
-## Aliases
+### Aliases
 
 I used to have a `.bash_aliases` file that I would wire into every OS I installed, but now everything is managed directly in this configuration.
 
@@ -113,7 +115,7 @@ update = "clear && sudo nixos-rebuild switch";
 This lets me simply run `update` from the terminal instead of typing the full rebuild command every time.
 
 
-## Desktop Entries
+### Desktop Entries
 
 The idea here is that I want to be able to open TUIs with a single click. I'm wrapping everything with **Alacritty** (my default terminal), which lets me launch these applications from **Wofi** or by clicking icons in **Waybar**.
 
@@ -129,6 +131,12 @@ desktop = {
     };
 };
 ```
+
+## Previews
+
+![Jaiba and Btop++](./assets/1.png)
+
+![Nemo and Wofi](./assets/2.png)
 
 ## Install
 
