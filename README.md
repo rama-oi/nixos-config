@@ -1,18 +1,20 @@
 # NixOS Configurations
 
-Just a bunch of nice things that I feel that make sense to share abotu how I keep my configuration organized. most of these things probably would look better in a different file but for now I'm enjoying having only one file that edit everything.
+Just a bunch of things that I think make sense to share about how I keep my configuration organized. Most of these things probably would look better in separate files, but for now I'm enjoying having only one file where I can edit everything.
 
 ## Details
 
 ### CSS Parser
 
-I had a situation where there were a lot of CSS escaped so having a JSON to CSS to make things looks more evenly sounded like a good idea. Also, let's keep in mind that the CSS I'm exporting is minified which is nice since I don't actually need to see the output anymore just the config o I can save some space.
+I had a situation where there was a lot of CSS scattered throughout the configuration, so having a way to generate CSS from Nix attributes and keep everything consistent sounded like a good idea.
+
+Another nice thing is that the CSS I'm generating is minified. I don't actually need to read the generated CSS anymore; I only need to work with the configuration itself, which also saves some space.
 
 ```nix
 environment.etc."wofi/catppuccin-mocha.css".text = css {
     "#window" = {
         "background-color" = theme.current.bg;
-        "border: = "0 none";
+        "border" = "0 none";
         "border-radius" = "0";
     };
 
@@ -28,7 +30,7 @@ environment.etc."wofi/catppuccin-mocha.css".text = css {
 
 ### Themes
 
-Because there were a lot of styles from different modules (like Waybar and Wofi) having a global theme would save me some time and I didn't have to define variables in CSS anymore (which is less lines of the final code).
+Because there are a lot of styles shared between different modules, like Waybar and Wofi, having a global theme saves me some time. I don't have to define the same colors in multiple places, which also keeps the configuration shorter.
 
 ```nix
 themes = {
@@ -47,9 +49,11 @@ themes = {
 };
 ```
 
-### Packages Organization
+### Package Organization
 
-I used to have a long list now I can create small groups and always remember why I installed this things in the first place (avoiding million comments explaining this) so If I installed some modules for something like **pcmanfm** and then I remove the package I know exactly that I can remove this group entirely.
+I used to have one long list of packages. Now I can create smaller groups and remember why I installed things in the first place. This also helps me avoid having a million comments explaining why every package is there.
+
+For example, if I install several packages for something like **PCManFM** and later remove it, I know exactly which group I can remove entirely.
 
 ```nix
 packages = {
@@ -73,17 +77,17 @@ packages = {
 
 ### Desktop Entries
 
-The idea behind this is that I want to be able to open TUI's with a single click so I'm wrapping everything into **alacritty** (my default terminal) and now I can run these apps from **wofi** or by clicking some icons in **waybar**.
+The idea here is that I want to be able to open TUIs with a single click. I'm wrapping everything with **Alacritty** (my default terminal), which lets me launch these applications from **Wofi** or by clicking icons in **Waybar**.
 
 ```nix
 desktop = {
     impala = pkgs.makeDesktopItem {
-    name = "impala";
-    desktopName = "Impala";
-    comment = "Wi-Fi TUI";
-    exec = "alacritty -e impala";
-    terminal = false;
-    categories = [ "Network" ];
+        name = "impala";
+        desktopName = "Impala";
+        comment = "Wi-Fi TUI";
+        exec = "alacritty -e impala";
+        terminal = false;
+        categories = [ "Network" ];
     };
 };
 ```
@@ -91,26 +95,31 @@ desktop = {
 ## Install
 
 ### Backup Default Configuration
+
 Copy the original NixOS configuration before replacing it:
+
 ```sh
 sudo cp -a /etc/nixos ~/git/81_cnf__nixos/backup/nixos
 ```
 
 ### Apply Custom Configuration System-Wide
+
 Replace the default `/etc/nixos` directory with a symlink to the Git-managed configuration:
+
 ```sh
 sudo rm -rf /etc/nixos
 sudo ln -s ~/git/81_cnf__nixos/nixos /etc/nixos
 ```
 
-### Verify the link:
+### Verify the Link
+
 ```sh
 ls -ld /etc/nixos
 ```
 
 It should show:
 
-```sh
+```text
 /etc/nixos -> /home/iqra/git/81_cnf__nixos/nixos
 ```
 
