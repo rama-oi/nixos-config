@@ -1122,35 +1122,23 @@ in
     enable = true;
 
     shellAliases = {
-      # ls: colors, hidden files, human-readable sizes,
-      # directories first
       ls = "ls -lah --color=always --group-directories-first";
-
-      # Prevent deleting root and ask for confirmation
       rm = "rm -I --preserve-root";
-
-      # Ask before overwriting files
       cp = "cp -i";
       mv = "mv -i";
-
-      # Create parent directories automatically
       mkdir = "mkdir -p";
-
-      # Rebuild NixOS
       update = "clear && sudo nixos-rebuild switch";
-
-      # Go up one directory
       ".." = "cd ..";
-
       cat = "bat";
     };
 
     promptInit = ''
       ${bashColorInit}
 
-      DIR="\e[''${BOLD};''${LIGHTGREEN}m"
-      CMD="\e[''${BOLD};''${LIGHTYELLOW}m"
-      PS1="\[$DIR\]\w\[$RESET\]$\[$CMD\]$\[$RESET\] "
+      DIR="''${BOLD}''${LIGHTGREEN}"
+      CMD="''${BOLD}''${LIGHTYELLOW}"
+
+      PS1="\[$DIR\]\w\[$RESET\]\[$CMD\]\$\[$RESET\] "
     '';
   };
 
