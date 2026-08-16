@@ -2,54 +2,7 @@
 
 Just a bunch of things that I think make sense to share about how I keep my configuration organized. Most of these things probably would look better in separate files, but for now I'm enjoying having only one file where I can edit everything.
 
-## Details
-
-### CSS Parser
-
-I had a situation where there was a lot of CSS scattered throughout the configuration, so having a way to generate CSS from Nix attributes and keep everything consistent sounded like a good idea.
-
-Another nice thing is that the CSS I'm generating is minified. I don't actually need to read the generated CSS anymore; I only need to work with the configuration itself, which also saves some space.
-
-```nix
-environment.etc."wofi/catppuccin-mocha.css".text = css {
-    "#window" = {
-        "background-color" = theme.current.bg;
-        "border" = "0 none";
-        "border-radius" = "0";
-    };
-
-    "#outer-box" = {
-        "padding" = "8px";
-        "background-color" = theme.current.bg;
-        "border" = "1px solid ${theme.current.blue}";
-        "font-size" = "${theme.font.size}px";
-        "font-family" = "\"${theme.font.family}\"";
-    };
-};
-```
-
-### Themes
-
-Because there are a lot of styles shared between different modules, like Waybar and Wofi, having a global theme saves me some time. I don't have to define the same colors in multiple places, which also keeps the configuration shorter.
-
-```nix
-themes = {
-    catppuccinMocha = {
-        bg = "#1e1e2e";
-        bgDark = "#11111b";
-        bgAlt = "#313244";
-        fg = "#cdd6f4";
-        muted = "#a6adc8";
-        blue = "#89b4fa";
-        mauve = "#cba6f7";
-        red = "#f38ba8";
-        green = "#a6e3a1";
-        peach = "#fab387";
-    };
-};
-```
-
-### Package Organization
+## Package Organization
 
 I used to have one long list of packages. Now I can create smaller groups and remember why I installed things in the first place. This also helps me avoid having a million comments explaining why every package is there.
 
@@ -75,24 +28,7 @@ packages = {
 };
 ```
 
-### Desktop Entries
-
-The idea here is that I want to be able to open TUIs with a single click. I'm wrapping everything with **Alacritty** (my default terminal), which lets me launch these applications from **Wofi** or by clicking icons in **Waybar**.
-
-```nix
-desktop = {
-    impala = pkgs.makeDesktopItem {
-        name = "impala";
-        desktopName = "Impala";
-        comment = "Wi-Fi TUI";
-        exec = "alacritty -e impala";
-        terminal = false;
-        categories = [ "Network" ];
-    };
-};
-```
-
-### Loops
+## Loops
 
 Being able to create repetitive structures in the configuration is such a time saver. I used to manually define a few keybindings for switching between workspaces, but now I only need this:
 
@@ -118,6 +54,81 @@ bindsym $mod+Shift+9 move container to workspace number 9
 ```
 
 This makes it much easier to change the number of workspaces later without having to manually update every keybinding.
+
+## CSS Parser
+
+I had a situation where there was a lot of CSS scattered throughout the configuration, so having a way to generate CSS from Nix attributes and keep everything consistent sounded like a good idea.
+
+Another nice thing is that the CSS I'm generating is minified. I don't actually need to read the generated CSS anymore; I only need to work with the configuration itself, which also saves some space.
+
+```nix
+environment.etc."wofi/catppuccin-mocha.css".text = css {
+    "#window" = {
+        "background-color" = theme.current.bg;
+        "border" = "0 none";
+        "border-radius" = "0";
+    };
+
+    "#outer-box" = {
+        "padding" = "8px";
+        "background-color" = theme.current.bg;
+        "border" = "1px solid ${theme.current.blue}";
+        "font-size" = "${theme.font.size}px";
+        "font-family" = "\"${theme.font.family}\"";
+    };
+};
+```
+
+## Themes
+
+Because there are a lot of styles shared between different modules, like Waybar and Wofi, having a global theme saves me some time. I don't have to define the same colors in multiple places, which also keeps the configuration shorter.
+
+```nix
+themes = {
+    catppuccinMocha = {
+        bg = "#1e1e2e";
+        bgDark = "#11111b";
+        bgAlt = "#313244";
+        fg = "#cdd6f4";
+        muted = "#a6adc8";
+        blue = "#89b4fa";
+        mauve = "#cba6f7";
+        red = "#f38ba8";
+        green = "#a6e3a1";
+        peach = "#fab387";
+    };
+};
+```
+
+## Aliases
+
+I used to have a `.bash_aliases` file that I would wire into every OS I installed, but now everything is managed directly in this configuration.
+
+After building the system, you'll probably want a few useful aliases. For example, I have this one for rebuilding NixOS:
+
+```nix
+update = "clear && sudo nixos-rebuild switch";
+```
+
+This lets me simply run `update` from the terminal instead of typing the full rebuild command every time.
+
+
+## Desktop Entries
+
+The idea here is that I want to be able to open TUIs with a single click. I'm wrapping everything with **Alacritty** (my default terminal), which lets me launch these applications from **Wofi** or by clicking icons in **Waybar**.
+
+```nix
+desktop = {
+    impala = pkgs.makeDesktopItem {
+        name = "impala";
+        desktopName = "Impala";
+        comment = "Wi-Fi TUI";
+        exec = "alacritty -e impala";
+        terminal = false;
+        categories = [ "Network" ];
+    };
+};
+```
 
 ## Install
 
