@@ -92,6 +92,33 @@ desktop = {
 };
 ```
 
+### Loops
+
+Being able to create repetitive structures in the configuration is such a time saver. I used to manually define a few keybindings for switching between workspaces, but now I only need this:
+
+```nix
+workspaces = builtins.genList (n: toString (n + 1)) 9;
+
+workspaceBindings = builtins.concatStringsSep "\n" (
+  map (n: ''
+    bindsym $mod+${n} workspace number ${n}
+    bindsym $mod+Shift+${n} move container to workspace number ${n}
+  '') workspaces
+);
+```
+
+This generates something like the following, which I can easily integrate into Sway:
+
+```text
+bindsym $mod+1 workspace number 1
+bindsym $mod+Shift+1 move container to workspace number 1
+...
+bindsym $mod+9 workspace number 9
+bindsym $mod+Shift+9 move container to workspace number 9
+```
+
+This makes it much easier to change the number of workspaces later without having to manually update every keybinding.
+
 ## Install
 
 ### Backup Default Configuration
