@@ -96,11 +96,6 @@ Copy the original NixOS configuration before replacing it:
 sudo cp -a /etc/nixos ~/git/81_cnf__nixos/backup/nixos
 ```
 
-### Create Link
-```sh
-ln -sfn ~/git/81_cnf__nixos/nixos ./links/nixos
-```
-
 ### Apply Custom Configuration System-Wide
 Replace the default `/etc/nixos` directory with a symlink to the Git-managed configuration:
 ```sh
