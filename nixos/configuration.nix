@@ -705,6 +705,7 @@ in
     exec pombo-battery-monitor
     exec bluetoothctl power off
     # exec swaybg -i /path/to/wallpaper.png -m fill
+    exec swaybg -c '${theme.current.accent20}'
 
     # GTK theme
     exec gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'
@@ -729,7 +730,7 @@ in
     }
 
     # Gaps
-    gaps inner ${theme.spacing.sm}
+    gaps inner ${theme.spacing.normal}
     gaps outer ${theme.spacing.sm}
 
     # Terminal
