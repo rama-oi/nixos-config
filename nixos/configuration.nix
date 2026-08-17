@@ -908,111 +908,71 @@ in
       "color" = theme.current.fg;
     };
 
-    "button:hover" = {
-      "box-shadow" = "inset 0 1px ${theme.current.accent10}";
-      "text-shadow" = "none";
-    };
-
-    "#workspaces button" = {
-      "padding" = "0 ${theme.spacing.sm}px";
-      "color" = theme.current.muted;
+    "button, button:hover" = {
+      "padding" = "0";
+      "margin" = "0";
       "background" = "transparent";
+      "border" = "0";
+      "box-shadow" = "none";
+      "text-shadow" = "unset";
+      "outline" = "unset";
+    };
+
+    "button label, #taskbar button, label" = {
+      "color" = theme.current.muted;
+      "background-color" = theme.current.bgAlt;
       "border" = "none";
-      "border-radius" = "0";
+      "padding" = "${theme.spacing.sm}px ${theme.spacing.normal}px";
+      "margin" = "${theme.spacing.sm}px";
+      "border-radius" = "25px";
+      "font-weight" = "bold";
     };
 
-    "#workspaces button:hover" = {
-      "color" = theme.current.fg;
+    "button label, #taskbar button" = {
+      "opacity" = "0.8";
+      "min-width" = "${theme.spacing.lg}px";
     };
 
-    "#workspaces button.focused" = {
-      "color" = theme.current.accent10;
-    };
-
-    "#workspaces button.urgent" = {
+    "button:hover label, #taskbar button:hover" = {
+      "opacity" = "1";
       "color" = theme.current.bg;
-      "background" = theme.current.danger;
+      "background" = theme.current.accent20;
     };
 
-    "#taskbar button" = {
-      "padding" = "0 ${theme.spacing.sm}px";
-      "color" = theme.current.muted;
-      "background" = "transparent";
-      "border" = "none";
-      "border-radius" = "0";
-    };
-
-    "#taskbar button:hover" = {
-      "color" = theme.current.fg;
-      "background" = theme.current.bgAlt;
+    "button.focused label" = {
+      "color" = theme.current.bg;
+      "background" = theme.current.accent10;
     };
 
     "#taskbar button.active" = {
-      "color" = theme.current.accent10;
-      "background" = theme.current.bgAlt;
+      "color" = theme.current.bg;
+      "background" = theme.current.muted;
     };
 
-    "#custom-bluetooth, #custom-camera, #custom-microphone, #network, #language, #backlight, #pulseaudio, #battery, #temperature, #clock" =
+    "button.urgent label" = {
+      "color" = theme.current.bg;
+      "background-color" = theme.current.accent10;
+    };
+
+    "#custom-bluetooth.bt-on, #pulseaudio.muted, #battery.critical, #custom-camera.active, #custom-microphone.active" =
       {
-        "padding" = "0 ${theme.spacing.sm}px";
+        "color" = theme.current.bg;
+        "background-color" = theme.current.danger;
       };
-
-    "#custom-bluetooth" = {
-      "color" = theme.current.fg;
-    };
-
-    "#custom-bluetooth.bt-on" = {
-      "color" = theme.current.danger;
-    };
-
-    "#language" = {
-      "color" = theme.current.accent10;
-    };
-
-    "#backlight" = {
-      "color" = theme.current.accent10;
-    };
-
-    "#pulseaudio" = {
-      "color" = theme.current.accent10;
-    };
-
-    "#pulseaudio.muted" = {
-      "color" = theme.current.danger;
-    };
-
-    "#battery" = {
-      "color" = theme.current.accent10;
-    };
-
-    "#battery.charging" = {
-      "color" = theme.current.success;
-    };
 
     "#battery.warning" = {
       "color" = theme.current.bg;
-      "background" = theme.current.warning;
+      "background-color" = theme.current.warning;
     };
 
-    "#battery.critical" = {
+    "#battery.charging, #temperature" = {
       "color" = theme.current.bg;
-      "background" = theme.current.danger;
+      "background-color" = theme.current.success;
     };
 
-    "#temperature" = {
-      "color" = theme.current.success;
-    };
-
-    "#clock" = {
-      "color" = theme.current.fg;
-    };
-
-    "#custom-camera, #custom-microphone" = {
-      "color" = theme.current.fg;
-    };
-
-    "#custom-camera.active, #custom-microphone.active" = {
-      "color" = theme.current.danger;
+    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" = {
+      "color" = theme.current.bg;
+      "background-color" = theme.current.accent20;
     };
   };
 
