@@ -36,11 +36,11 @@ let
       bgAlt = "#313244";
       fg = "#cdd6f4";
       muted = "#a6adc8";
-      blue = "#89b4fa";
-      mauve = "#cba6f7";
-      red = "#f38ba8";
-      green = "#a6e3a1";
-      peach = "#fab387";
+      accent10 = "#cba6f7"; # mauve
+      accent20 = "#89b4fa"; # blue
+      danger = "#f38ba8"; # red
+      warning = "#fab387"; # peach
+      success = "#a6e3a1"; # green
     };
   };
 
@@ -714,7 +714,7 @@ in
     default_floating_border pixel 1
 
     # Window colors
-    client.focused ${theme.current.mauve} ${theme.current.bgAlt} ${theme.current.fg} ${theme.current.mauve} ${theme.current.bgAlt}
+    client.focused ${theme.current.accent10} ${theme.current.bgAlt} ${theme.current.fg} ${theme.current.accent10} ${theme.current.bgAlt}
     client.unfocused ${theme.current.bg} ${theme.current.bg} ${theme.current.muted} ${theme.current.bgAlt} ${theme.current.bg}
 
     # Display
@@ -909,7 +909,7 @@ in
     };
 
     "button:hover" = {
-      "box-shadow" = "inset 0 1px ${theme.current.mauve}";
+      "box-shadow" = "inset 0 1px ${theme.current.accent10}";
       "text-shadow" = "none";
     };
 
@@ -926,12 +926,12 @@ in
     };
 
     "#workspaces button.focused" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
     };
 
     "#workspaces button.urgent" = {
       "color" = theme.current.bg;
-      "background" = theme.current.red;
+      "background" = theme.current.danger;
     };
 
     "#taskbar button" = {
@@ -948,7 +948,7 @@ in
     };
 
     "#taskbar button.active" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
       "background" = theme.current.bgAlt;
     };
 
@@ -962,45 +962,45 @@ in
     };
 
     "#custom-bluetooth.bt-on" = {
-      "color" = theme.current.red;
+      "color" = theme.current.danger;
     };
 
     "#language" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
     };
 
     "#backlight" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
     };
 
     "#pulseaudio" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
     };
 
     "#pulseaudio.muted" = {
-      "color" = theme.current.red;
+      "color" = theme.current.danger;
     };
 
     "#battery" = {
-      "color" = theme.current.mauve;
+      "color" = theme.current.accent10;
     };
 
     "#battery.charging" = {
-      "color" = theme.current.green;
+      "color" = theme.current.success;
     };
 
     "#battery.warning" = {
       "color" = theme.current.bg;
-      "background" = theme.current.peach;
+      "background" = theme.current.warning;
     };
 
     "#battery.critical" = {
       "color" = theme.current.bg;
-      "background" = theme.current.red;
+      "background" = theme.current.danger;
     };
 
     "#temperature" = {
-      "color" = theme.current.green;
+      "color" = theme.current.success;
     };
 
     "#clock" = {
@@ -1012,7 +1012,7 @@ in
     };
 
     "#custom-camera.active, #custom-microphone.active" = {
-      "color" = theme.current.red;
+      "color" = theme.current.danger;
     };
   };
 
@@ -1041,7 +1041,7 @@ in
     "#outer-box" = {
       "padding" = "8px";
       "background-color" = theme.current.bg;
-      "border" = "1px solid ${theme.current.blue}";
+      "border" = "1px solid ${theme.current.accent20}";
       "font-size" = "${theme.font.size}px";
       "font-family" = "\"${theme.font.family}\"";
     };
@@ -1072,7 +1072,7 @@ in
     };
 
     "#entry:selected" = {
-      "background-color" = theme.current.mauve;
+      "background-color" = theme.current.accent10;
       "outline" = "none";
     };
 
@@ -1091,12 +1091,12 @@ in
     [mode=default]
     background-color=${theme.current.bg}
     text-color=${theme.current.fg}
-    border-color=${theme.current.mauve}
+    border-color=${theme.current.accent10}
 
     [urgency=critical]
-    background-color=${theme.current.red}
+    background-color=${theme.current.danger}
     text-color=${theme.current.bg}
-    border-color=${theme.current.red}
+    border-color=${theme.current.danger}
   '';
 
   # ------ Program :: Alacritty
