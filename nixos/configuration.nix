@@ -29,21 +29,6 @@ let
 
   # ------ Vars :: Themes
 
-  themes = {
-    catppuccinMocha = {
-      bg = "#1e1e2e";
-      bgDark = "#11111b";
-      bgAlt = "#313244";
-      fg = "#cdd6f4";
-      muted = "#a6adc8";
-      accent10 = "#cba6f7"; # mauve
-      accent20 = "#89b4fa"; # blue
-      danger = "#f38ba8"; # red
-      warning = "#fab387"; # peach
-      success = "#a6e3a1"; # green
-    };
-  };
-
   bashColors = {
     RESET = "0";
     BOLD = "1";
@@ -68,8 +53,31 @@ let
     builtins.map (name: "${name}=\"\\e[${bashColors.${name}}m\"") (builtins.attrNames bashColors)
   );
 
+  themes = {
+    catppuccinMocha = {
+      bg = "#1e1e2e";
+      bgDark = "#11111b";
+      bgAlt = "#313244";
+      fg = "#cdd6f4";
+      muted = "#a6adc8";
+      accent10 = "#cba6f7"; # mauve
+      danger = "#f38ba8"; # red
+      warning = "#fab387"; # peach
+      success = "#a6e3a1"; # green
+    };
+  };
+
   theme = {
-    current = themes.catppuccinMocha;
+    current = themes.catppuccinMocha // {
+      # accent20 = "#f5c2e7"; # pink
+      # accent20 = "#89b4fa"; # blue
+      # accent20 = "#f38ba8"; # red
+      # accent20 = "#a6e3a1"; # green
+      # accent20 = "#fab387"; # peach
+      # accent20 = "#89dceb"; # sky
+      # accent20 = "#b4befe"; # lavender
+      accent20 = "#fab387"; # peach
+    };
 
     font = {
       family = "JetBrainsMono Nerd Font";
@@ -798,7 +806,6 @@ in
     "modules-left" = [
       "sway/workspaces"
       "wlr/taskbar"
-      "custom/msg"
     ];
 
     "modules-center" = [ ];
@@ -814,6 +821,7 @@ in
       "battery"
       "temperature"
       "clock"
+      "custom/msg"
     ];
 
     "custom/msg" = {
@@ -1152,6 +1160,7 @@ in
 
         printf '%b' "\n''${YELLOW}Switched to NixOS generation ''${LIGHTCYAN}''${new_generation}''${RESET}\n"
 
+        # Restart Sway components that don't automatically reload.
         swaymsg reload
 
         # Restart Waybar.
