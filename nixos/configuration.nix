@@ -29,18 +29,6 @@ let
 
   # ------ Vars :: Themes
 
-  quotes = [
-    "remember to steal bread"
-    "the horrors persist, but so do i"
-    "wake up. commit nonsense."
-    "have you tried turning yourself off and on again?"
-    "god gives his hardest battles to his silliest soldiers"
-    "sudo steal bread"
-    "systemctl --user start silly.service"
-    "another day, another poor decision"
-    "be the problem you want to see in the world"
-  ];
-
   themes = {
     catppuccinMocha = {
       bg = "#1e1e2e";
@@ -267,11 +255,16 @@ let
   pombo = {
     script = {
       waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
-        QUOTE_FILE="''${XDG_RUNTIME_DIR}/pombo-waybar-quote"
+        quotes=(
+          "the horrors persist, but so do i"
+          "wake up. commit nonsense."
+          "have you tried turning yourself off and on again?"
+          "god gives his hardest battles to his silliest soldiers"
+          "another day, another poor decision"
+          "be the problem you want to see in the world"
+        )
 
-        printf '%s\n' \
-          ${builtins.concatStringsSep "\n" (map (quote: ''"${quote}"'') quotes)} \
-          | shuf -n 1 > "$QUOTE_FILE"
+        printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
       '';
 
       waybarBluetooth = pkgs.writeShellScriptBin "pombo-waybar-bluetooth" ''
@@ -721,7 +714,6 @@ in
     include /etc/sway/config.d/*
 
     # Startup
-    exec pombo-waybar-quote
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
     exec pombo-battery-monitor
@@ -825,8 +817,7 @@ in
     ];
 
     "custom/msg" = {
-      exec = "cat $XDG_RUNTIME_DIR/pombo-waybar-quote";
-      interval = 1;
+      exec = "${pombo.script.waybarQuote}/bin/pombo-waybar-quote";
       format = ":: {} ::";
       tooltip = false;
     };
