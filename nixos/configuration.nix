@@ -920,7 +920,6 @@ in
 
     "button label, #taskbar button, label" = {
       "color" = theme.current.muted;
-      "background-color" = theme.current.bgAlt;
       "border" = "none";
       "padding" = "0px ${theme.spacing.normal}px";
       "margin" = "${theme.spacing.sm}px";
