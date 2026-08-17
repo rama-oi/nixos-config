@@ -830,6 +830,7 @@ in
       "on-click" = "activate";
       "on-click-middle" = "close";
       "all-outputs" = true;
+      "sort-by" = "name";
     };
 
     network = {
@@ -919,6 +920,13 @@ in
       "outline" = "unset";
     };
 
+    "#taskbar" = {
+      "background-color" = theme.current.bgAlt;
+      "border-radius" = "25px";
+      "padding" = "0px ${theme.spacing.normal}px";
+      "margin" = "0 ${theme.spacing.sm}px";
+    };
+
     "button label, #taskbar button, label" = {
       "color" = theme.current.muted;
       "border" = "none";
@@ -928,26 +936,26 @@ in
       "font-weight" = "bold";
       "min-width" = "${theme.spacing.lg}px";
       "min-height" = "22px";
+      "transition" = "0";
     };
 
     "button:hover label, #taskbar button:hover" = {
       "color" = theme.current.bg;
-      "background" = theme.current.accent20;
+      "background" = theme.current.accent10;
     };
 
     "button.focused label" = {
       "color" = theme.current.bg;
-      "background" = theme.current.accent10;
+      "background" = theme.current.accent20;
     };
 
     "#taskbar button.active" = {
-      "color" = theme.current.bg;
-      "background" = theme.current.muted;
+      "background" = theme.current.accent20;
     };
 
     "button.urgent label" = {
       "color" = theme.current.bg;
-      "background-color" = theme.current.accent10;
+      "background-color" = theme.current.warning;
     };
 
     "#custom-bluetooth.bt-on, #pulseaudio.muted, #battery.critical, #custom-camera.active, #custom-microphone.active" =
