@@ -929,12 +929,7 @@ in
       "min-height" = "22px";
     };
 
-    "button label, #taskbar button" = {
-      "opacity" = "0.8";
-    };
-
     "button:hover label, #taskbar button:hover" = {
-      "opacity" = "1";
       "color" = theme.current.bg;
       "background" = theme.current.accent20;
     };
