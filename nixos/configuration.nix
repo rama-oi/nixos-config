@@ -925,11 +925,12 @@ in
       "margin" = "${theme.spacing.sm}px";
       "border-radius" = "25px";
       "font-weight" = "bold";
+      "min-width" = "${theme.spacing.lg}px";
+      "min-height" = "22px";
     };
 
     "button label, #taskbar button" = {
       "opacity" = "0.8";
-      "min-width" = "${theme.spacing.lg}px";
     };
 
     "button:hover label, #taskbar button:hover" = {
