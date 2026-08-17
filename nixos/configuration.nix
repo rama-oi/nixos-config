@@ -922,7 +922,7 @@ in
       "color" = theme.current.muted;
       "background-color" = theme.current.bgAlt;
       "border" = "none";
-      "padding" = "${theme.spacing.sm}px ${theme.spacing.normal}px";
+      "padding" = "0px ${theme.spacing.normal}px";
       "margin" = "${theme.spacing.sm}px";
       "border-radius" = "25px";
       "font-weight" = "bold";
