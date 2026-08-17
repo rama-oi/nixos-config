@@ -829,6 +829,7 @@ in
       "tooltip-format" = "{title}";
       "on-click" = "activate";
       "on-click-middle" = "close";
+      "all-outputs" = true;
     };
 
     network = {
