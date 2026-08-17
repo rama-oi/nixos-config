@@ -64,7 +64,7 @@ I had a situation where there was a lot of CSS scattered throughout the configur
 Another nice thing is that the CSS I'm generating is minified. I don't actually need to read the generated CSS anymore; I only need to work with the configuration itself, which also saves some space.
 
 ```nix
-environment.etc."wofi/catppuccin-mocha.css".text = css {
+environment.etc."wofi/catppuccin-mocha.css".text = parser.css {
     "#window" = {
         "background-color" = theme.current.bg;
         "border" = "0 none";

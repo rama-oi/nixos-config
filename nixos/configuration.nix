@@ -3,25 +3,29 @@
 let
   # ------ Parsers :: CSS
 
-  css =
-    rules:
-    let
-      renderDeclaration = property: value: "${property}:${value};";
+  parser = {
+    css =
+      rules:
+      let
+        renderDeclaration = property: value: "${property}:${value};";
 
-      renderRule =
-        selector: declarations:
-        "${selector}{"
-        + builtins.concatStringsSep "" (
-          builtins.map (property: renderDeclaration property declarations.${property}) (
-            builtins.attrNames declarations
+        renderRule =
+          selector: declarations:
+          "${selector}{"
+          + builtins.concatStringsSep "" (
+            builtins.map (property: renderDeclaration property declarations.${property}) (
+              builtins.attrNames declarations
+            )
           )
-        )
-        + "}";
+          + "}";
 
-    in
-    builtins.concatStringsSep "" (
-      builtins.map (selector: renderRule selector rules.${selector}) (builtins.attrNames rules)
-    );
+      in
+      builtins.concatStringsSep "" (
+        builtins.map (selector: renderRule selector rules.${selector}) (builtins.attrNames rules)
+      );
+    # svg = { };
+    # toml = { };
+  };
 
   # ------ Vars :: Themes
 
@@ -893,7 +897,7 @@ in
     };
   };
 
-  environment.etc."waybar/style.css".text = css {
+  environment.etc."waybar/style.css".text = parser.css {
     "*" = {
       "font-family" = "\"${theme.font.family}\"";
       "font-size" = "${theme.font.size}px";
@@ -1027,7 +1031,7 @@ in
     style=/etc/wofi/catppuccin-mocha.css
   '';
 
-  environment.etc."wofi/catppuccin-mocha.css".text = css {
+  environment.etc."wofi/catppuccin-mocha.css".text = parser.css {
     "#window" = {
       "background-color" = theme.current.bg;
       "border" = "0 none";
