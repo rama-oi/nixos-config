@@ -29,6 +29,18 @@ let
 
   # ------ Vars :: Themes
 
+  quotes = [
+    "remember to steal bread"
+    "the horrors persist, but so do i"
+    "wake up. commit nonsense."
+    "have you tried turning yourself off and on again?"
+    "god gives his hardest battles to his silliest soldiers"
+    "sudo steal bread"
+    "systemctl --user start silly.service"
+    "another day, another poor decision"
+    "be the problem you want to see in the world"
+  ];
+
   themes = {
     catppuccinMocha = {
       bg = "#1e1e2e";
@@ -235,6 +247,7 @@ let
       pombo.script.waybarCamera
       pombo.script.waybarMicrophone
       pombo.script.fastfetchLaunch
+      pombo.script.waybarQuote
     ];
   };
 
@@ -253,6 +266,14 @@ let
 
   pombo = {
     script = {
+      waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
+        QUOTE_FILE="''${XDG_RUNTIME_DIR}/pombo-waybar-quote"
+
+        printf '%s\n' \
+          ${builtins.concatStringsSep "\n" (map (quote: ''"${quote}"'') quotes)} \
+          | shuf -n 1 > "$QUOTE_FILE"
+      '';
+
       waybarBluetooth = pkgs.writeShellScriptBin "pombo-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
           printf '{"text":"bt:1","class":"bt-on"}'
@@ -700,6 +721,7 @@ in
     include /etc/sway/config.d/*
 
     # Startup
+    exec pombo-waybar-quote
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
     exec pombo-battery-monitor
@@ -784,6 +806,7 @@ in
     "modules-left" = [
       "sway/workspaces"
       "wlr/taskbar"
+      "custom/msg"
     ];
 
     "modules-center" = [ ];
@@ -800,6 +823,13 @@ in
       "temperature"
       "clock"
     ];
+
+    "custom/msg" = {
+      exec = "cat $XDG_RUNTIME_DIR/pombo-waybar-quote";
+      interval = 1;
+      format = ":: {} ::";
+      tooltip = false;
+    };
 
     "custom/camera" = {
       exec = "${pombo.script.waybarCamera}/bin/pombo-waybar-camera";
@@ -826,6 +856,7 @@ in
 
     "wlr/taskbar" = {
       format = "{icon}";
+      tooltip = false;
       "icon-size" = 16;
       "tooltip-format" = "{title}";
       "on-click" = "activate";
@@ -959,6 +990,11 @@ in
       "background-color" = theme.current.warning;
     };
 
+    "#custom-msg" = {
+      color = theme.current.accent10;
+      font-weight = "bold";
+    };
+
     "#custom-bluetooth.bt-on, #pulseaudio.muted, #battery.critical, #custom-camera.active, #custom-microphone.active" =
       {
         "color" = theme.current.bg;
@@ -975,10 +1011,11 @@ in
       "background-color" = theme.current.success;
     };
 
-    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" = {
-      "color" = theme.current.bg;
-      "background-color" = theme.current.accent20;
-    };
+    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
+      {
+        "color" = theme.current.bg;
+        "background-color" = theme.current.accent20;
+      };
   };
 
   # ------ Program :: Wofi
