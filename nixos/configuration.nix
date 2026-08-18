@@ -71,12 +71,12 @@ let
     current = themes.catppuccinMocha // {
       # accent20 = "#f5c2e7"; # pink
       # accent20 = "#89b4fa"; # blue
-      # accent20 = "#f38ba8"; # red
+      accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
       # accent20 = "#89dceb"; # sky
       # accent20 = "#b4befe"; # lavender
-      accent20 = "#fab387"; # peach
+      # accent20 = "#fab387"; # peach
     };
 
     font = {
@@ -622,6 +622,7 @@ in
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";
+    XDG_CURRENT_DESKTOP = "sway";
   };
 
   # ------ Program :: Neovim
@@ -722,6 +723,7 @@ in
     include /etc/sway/config.d/*
 
     # Startup
+    exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
     exec pombo-battery-monitor
