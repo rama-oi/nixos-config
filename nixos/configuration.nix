@@ -1153,6 +1153,8 @@ in
       ${bashColorInit}
 
       record() {
+        clear
+        
         timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
         wf-recorder -o eDP-1 -f "$HOME/Videos/screen-$timestamp.mp4"
       }
