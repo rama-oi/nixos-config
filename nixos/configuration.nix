@@ -1,4 +1,8 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 
 let
   # ------ Parsers :: CSS
@@ -130,6 +134,7 @@ let
       wl-clipboard
       grim
       slurp
+      wf-recorder
 
       tree
       jq
@@ -217,7 +222,6 @@ let
     ];
 
     media = with pkgs; [
-      obs-studio
       video-downloader
       ffmpeg
       vlc
@@ -260,15 +264,16 @@ let
 
   # ------ Custom Scripts
 
+  # "the horrors persist, but so do i"
+  # "wake up. commit nonsense."
+  # "have you tried turning yourself off and on again?"
+  # "god gives his hardest battles to his silliest soldiers"
+  # "another day, another poor decision"
+
   pombo = {
     script = {
       waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
         quotes=(
-          "the horrors persist, but so do i"
-          "wake up. commit nonsense."
-          "have you tried turning yourself off and on again?"
-          "god gives his hardest battles to his silliest soldiers"
-          "another day, another poor decision"
           "be the problem you want to see in the world"
         )
 
@@ -723,12 +728,13 @@ in
     include /etc/sway/config.d/*
 
     # Startup
+    exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
     exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
     exec pombo-battery-monitor
     exec bluetoothctl power off
-    # exec swaybg -i /path/to/wallpaper.png -m fill
     exec swaybg -c '${theme.current.accent20}'
 
     # GTK theme
@@ -1146,6 +1152,11 @@ in
     promptInit = ''
       ${bashColorInit}
 
+      record() {
+        timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
+        wf-recorder -o eDP-1 -f "$HOME/Videos/screen-$timestamp.mp4"
+      }
+
       update() {
         clear
 
@@ -1179,12 +1190,13 @@ in
     '';
   };
 
-  # ------ State version
-
-  system.stateVersion = "26.05";
-
   # ------ Samsung Development
+
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", ATTR{idProduct}=="685d", TAG+="uaccess"
   '';
+
+  # ------ State version
+
+  system.stateVersion = "26.05";
 }
