@@ -74,8 +74,8 @@ let
   theme = {
     current = themes.catppuccinMocha // {
       # accent20 = "#f5c2e7"; # pink
-      # accent20 = "#89b4fa"; # blue
-      accent20 = "#f38ba8"; # red
+      accent20 = "#89b4fa"; # blue
+      # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
       # accent20 = "#89dceb"; # sky
@@ -182,6 +182,10 @@ let
       file
     ];
 
+    developmentGo = with pkgs; [
+      go
+    ];
+
     android = with pkgs; [
       android-studio
       androidSdk
@@ -238,6 +242,7 @@ let
     misc = with pkgs; [
       keepassxc
       pombo.app.jaiba
+      pombo.appGo.vex-tui
     ];
 
     pombo = with pkgs; [
@@ -446,6 +451,22 @@ let
           install -Dm644 assets/jaiba.desktop \
             $out/share/applications/jaiba.desktop
         '';
+      };
+    };
+
+    appGo = {
+      vex-tui = pkgs.buildGoModule rec {
+        pname = "vex-tui";
+        version = "2.1.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "CodeOne45";
+          repo = "vex-tui";
+          rev = "v2.1.0";
+          hash = "sha256-wmze6OkX8Oxm+HtHBWo1+oSVDUR4PWWTTW/Ldu5z8pc=";
+        };
+
+        vendorHash = "sha256-jE53+VEjj5E5G2Yycwb8NDA8vDtoUtarrQgZ9ULyVh0=";
       };
     };
   };
