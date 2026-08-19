@@ -445,15 +445,6 @@ let
         postInstall = ''
           install -Dm644 assets/jaiba.desktop \
             $out/share/applications/jaiba.desktop
-
-          install -Dm644 assets/jaiba.svg \
-            $out/share/icons/hicolor/scalable/apps/jaiba.svg
-
-          for size in 16 22 24 32 48 64 72 96 128 192 256 512; do
-            install -Dm644 \
-              assets/icon_''${size}x''${size}.png \
-              $out/share/icons/hicolor/''${size}x''${size}/apps/jaiba.png
-          done
         '';
       };
     };
