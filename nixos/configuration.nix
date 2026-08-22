@@ -916,7 +916,11 @@ in
     bindsym $mod+r reload
 
     # Power
-    bindsym $mod+Escape exec swaynag -t warning -m 'Shutdown?' -B 'Yes' 'systemctl poweroff'
+    bindsym $mod+Escape exec swaynag \
+      -t custom \
+      -m 'Are you sure you want to shut down the computer?' \
+      -Z 'Yes' 'systemctl poweroff' \
+      -s 'No'
 
     ${workspaceBindings}
 
@@ -941,6 +945,19 @@ in
 
     # Screenshot
     bindsym Print exec grim -g "$(slurp)" - | wl-copy
+  '';
+
+  environment.etc."swaynag/config".text = ''
+    [custom]
+    background=${theme.current.bgAlt}
+    text=${theme.current.fg}
+    button-background=${theme.current.accent10}
+    button-text=${theme.current.bg}
+    border=${theme.current.bgAlt}
+    button-border-size=4
+    button-padding=4
+    button-gap=0
+    button-dismiss-gap=4
   '';
 
   # ------ Program :: Waybar
