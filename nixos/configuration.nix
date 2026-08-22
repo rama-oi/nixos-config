@@ -182,17 +182,17 @@ let
       file
     ];
 
-    developmentGo = with pkgs; [
-      go
-    ];
+    # developmentGo = with pkgs; [
+    #   go
+    # ];
 
-    android = with pkgs; [
+    developmentAndroid = with pkgs; [
       android-studio
       androidSdk
       android-tools
     ];
 
-    androidSamsung = with pkgs; [
+    developmentAndroidSamsung = with pkgs; [
       heimdall
       usbutils
     ];
@@ -229,7 +229,6 @@ let
       video-downloader
       ffmpeg
       vlc
-      #wl-screenrec
     ];
 
     games = with pkgs; [
@@ -242,7 +241,9 @@ let
     misc = with pkgs; [
       keepassxc
       pombo.app.jaiba
-      pombo.appGo.vex-tui
+      xkeyboard-config
+      libxkbcommon
+      # pombo.appGo.vex-tui
     ];
 
     pombo = with pkgs; [
@@ -454,21 +455,21 @@ let
       };
     };
 
-    appGo = {
-      vex-tui = pkgs.buildGoModule rec {
-        pname = "vex-tui";
-        version = "2.1.0";
+    # appGo = {
+    #   vex-tui = pkgs.buildGoModule rec {
+    #     pname = "vex-tui";
+    #     version = "2.1.0";
 
-        src = pkgs.fetchFromGitHub {
-          owner = "CodeOne45";
-          repo = "vex-tui";
-          rev = "v2.1.0";
-          hash = "sha256-wmze6OkX8Oxm+HtHBWo1+oSVDUR4PWWTTW/Ldu5z8pc=";
-        };
+    #     src = pkgs.fetchFromGitHub {
+    #       owner = "CodeOne45";
+    #       repo = "vex-tui";
+    #       rev = "v2.1.0";
+    #       hash = "sha256-wmze6OkX8Oxm+HtHBWo1+oSVDUR4PWWTTW/Ldu5z8pc=";
+    #     };
 
-        vendorHash = "sha256-jE53+VEjj5E5G2Yycwb8NDA8vDtoUtarrQgZ9ULyVh0=";
-      };
-    };
+    #     vendorHash = "sha256-jE53+VEjj5E5G2Yycwb8NDA8vDtoUtarrQgZ9ULyVh0=";
+    #   };
+    # };
   };
 
   # ------ Android SDK
@@ -505,6 +506,109 @@ let
 
   androidSdk = androidComposition.androidsdk;
 
+  # ------ GRUB :: Catppuccin Mocha Theme
+  grubTheme = pkgs.runCommand "pombo-grub-theme" { } ''
+    mkdir -p $out
+
+    cat > $out/theme.txt <<'EOF'
+    # Pombo GRUB Theme
+    # Catppuccin Mocha
+
+    title-text: ""
+
+    desktop-color: "${theme.current.bg}"
+
+    terminal-font: "Unifont Regular 16"
+    terminal-left: "0"
+    terminal-top: "0"
+    terminal-width: "100%"
+    terminal-height: "100%"
+    terminal-border: "0"
+
+    # NixOS title
+    + label {
+      left = 50%-300
+      top = 12%
+      width = 600
+      height = 40
+
+      text = "NIXOS"
+      align = "center"
+
+      font = "Unifont Regular 24"
+      color = "${theme.current.accent10}"
+    }
+
+    # Subtitle
+    + label {
+      left = 50%-300
+      top = 18%
+      width = 600
+      height = 30
+
+      text = "system generations"
+      align = "center"
+
+      font = "Unifont Regular 16"
+      color = "${theme.current.muted}"
+    }
+
+    # Generation menu
+    + boot_menu {
+      left = 50%-360
+      top = 30%
+      width = 720
+      height = 45%
+
+      item_font = "Unifont Regular 16"
+      selected_item_font = "Unifont Regular 16"
+
+      item_color = "${theme.current.muted}"
+      selected_item_color = "${theme.current.bg}"
+
+      item_height = 42
+      item_padding = 8
+      item_spacing = 6
+
+      icon_width = 32
+      icon_height = 32
+      item_icon_space = 16
+
+      scrollbar = false
+    }
+
+    # Countdown
+    + label {
+      left = 50%-300
+      top = 82%
+      width = 600
+      height = 30
+
+      align = "center"
+
+      id = "__timeout__"
+      text = "Booting in %d seconds"
+
+      font = "Unifont Regular 16"
+      color = "${theme.current.muted}"
+    }
+
+    # Countdown progress bar
+    + progress_bar {
+      left = 50%-300
+      top = 88%
+      width = 600
+      height = 4
+
+      id = "__timeout__"
+
+      fg_color = "${theme.current.accent20}"
+      bg_color = "${theme.current.bgAlt}"
+      border_color = "${theme.current.bg}"
+    }
+    EOF
+  '';
+
 in
 {
   # ------ Imports
@@ -532,10 +636,10 @@ in
     };
   };
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  # services.xserver.xkb = {
+  #   layout = "us";
+  #   variant = "";
+  # };
 
   # ------ Nix :: experimental features
 
@@ -551,11 +655,27 @@ in
     allowUnfree = true;
   };
 
-  # ------ Boot
-
+  # ------ Boot :: GRUB
   boot = {
-    loader.systemd-boot.enable = true;
+    loader.systemd-boot.enable = false;
+
     loader.efi.canTouchEfiVariables = true;
+
+    loader.grub = {
+      enable = true;
+
+      efiSupport = true;
+      device = "nodev";
+
+      gfxmodeEfi = "1920x1080";
+      gfxpayloadEfi = "keep";
+
+      timeoutStyle = "menu";
+
+      configurationLimit = 10;
+      theme = grubTheme;
+    };
+
     initrd.luks.devices."luks-26f0579d-79fe-4ff9-96fa-f432718e7385".device =
       "/dev/disk/by-uuid/26f0579d-79fe-4ff9-96fa-f432718e7385";
   };
@@ -738,6 +858,11 @@ in
     set $mod Mod4
 
     include /etc/sway/config.d/*
+
+    input * {
+      xkb_layout us
+      xkb_variant ""
+    }
 
     # Startup
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
