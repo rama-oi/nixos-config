@@ -199,7 +199,6 @@ let
 
     containers = with pkgs; [
       docker
-      virtualbox
     ];
 
     creative = with pkgs; [
@@ -516,7 +515,7 @@ let
 
     title-text: ""
 
-    desktop-color: "${theme.current.bg}"
+    desktop-color: "${theme.current.bgDark}"
 
     terminal-font: "Unifont Regular 16"
     terminal-left: "0"
@@ -555,16 +554,16 @@ let
 
     # Generation menu
     + boot_menu {
-      left = 50%-360
+      left = 50%-300
       top = 30%
-      width = 720
+      width = 600
       height = 45%
 
       item_font = "Unifont Regular 16"
       selected_item_font = "Unifont Regular 16"
 
       item_color = "${theme.current.muted}"
-      selected_item_color = "${theme.current.bg}"
+      selected_item_color = "${theme.current.accent20}"
 
       item_height = 42
       item_padding = 8
@@ -761,6 +760,10 @@ in
     MOZ_ENABLE_WAYLAND = "1";
     XDG_CURRENT_DESKTOP = "sway";
   };
+
+  # ------ Virtualization
+  # virtualisation.libvirtd.enable = true;
+  # programs.virt-manager.enable = true;
 
   # ------ Program :: Neovim
 
