@@ -252,7 +252,7 @@ let
       pombo.script.waybarCamera
       pombo.script.waybarMicrophone
       pombo.script.fastfetchLaunch
-      pombo.script.waybarQuote
+      # pombo.script.waybarQuote
     ];
   };
 
@@ -269,21 +269,22 @@ let
 
   # ------ Custom Scripts
 
-  # "the horrors persist, but so do i"
-  # "wake up. commit nonsense."
-  # "have you tried turning yourself off and on again?"
-  # "god gives his hardest battles to his silliest soldiers"
-  # "another day, another poor decision"
+
 
   pombo = {
     script = {
-      waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
-        quotes=(
-          "be the problem you want to see in the world"
-        )
+      # waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
+      #   quotes=(
+      #     "be the problem you want to see in the world"
+      #     "the horrors persist, but so do i"
+      #     "wake up. commit nonsense."
+      #     "have you tried turning yourself off and on again?"
+      #     "god gives his hardest battles to his silliest soldiers"
+      #     "another day, another poor decision"
+      #   )
 
-        printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
-      '';
+      #   printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
+      # '';
 
       waybarBluetooth = pkgs.writeShellScriptBin "pombo-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
@@ -989,11 +990,11 @@ in
       "custom/msg"
     ];
 
-    "custom/msg" = {
-      exec = "${pombo.script.waybarQuote}/bin/pombo-waybar-quote";
-      format = ":: {} ::";
-      tooltip = false;
-    };
+    # "custom/msg" = {
+    #   exec = "${pombo.script.waybarQuote}/bin/pombo-waybar-quote";
+    #   format = ":: {} ::";
+    #   tooltip = false;
+    # };
 
     "custom/camera" = {
       exec = "${pombo.script.waybarCamera}/bin/pombo-waybar-camera";
