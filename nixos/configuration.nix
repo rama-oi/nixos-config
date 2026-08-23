@@ -473,7 +473,7 @@ let
           owner = "rama-oi";
           repo = "caiman";
           rev = "2026.1";
-          hash = "sha256-OlVPan9jzbOUdKAbbH0S7KwNkLXKpTjfw1PMADkgWKE=";
+          hash = "sha256-oIhptAYvfNqoo2s4uOcPFXHVp7A2j/9/mGyU6vSXXyc=";
         };
 
         nativeBuildInputs = with pkgs; [
