@@ -636,10 +636,10 @@ in
     };
   };
 
-  # services.xserver.xkb = {
-  #   layout = "us";
-  #   variant = "";
-  # };
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
 
   # ------ Nix :: experimental features
 
@@ -862,11 +862,6 @@ in
     set $mod Mod4
 
     include /etc/sway/config.d/*
-
-    input * {
-      xkb_layout us
-      xkb_variant ""
-    }
 
     # Startup
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
