@@ -240,6 +240,8 @@ let
     misc = with pkgs; [
       keepassxc
       pombo.app.jaiba
+      pombo.app.caiman
+      pombo.desktop.caiman
       xkeyboard-config
       libxkbcommon
       # pombo.appGo.vex-tui
@@ -268,8 +270,6 @@ let
   );
 
   # ------ Custom Scripts
-
-
 
   pombo = {
     script = {
@@ -432,6 +432,17 @@ let
           "Calendar"
         ];
       };
+
+      caiman = pkgs.makeDesktopItem {
+        name = "caiman";
+        desktopName = "Caiman";
+        comment = "Keyboard Layout TUI";
+        exec = "alacritty -e caiman";
+        terminal = false;
+        categories = [
+          "Utility"
+        ];
+      };
     };
 
     app = {
@@ -452,6 +463,33 @@ let
           install -Dm644 assets/jaiba.desktop \
             $out/share/applications/jaiba.desktop
         '';
+      };
+
+      caiman = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "caiman";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "caiman";
+          rev = "2026.1";
+          hash = "sha256-OlVPan9jzbOUdKAbbH0S7KwNkLXKpTjfw1PMADkgWKE=";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+        ];
+
+        buildInputs = with pkgs; [
+          libxkbcommon
+        ];
+
+        cargoHash = "sha256-mnjFMmwAyKkFA7uLl4Xdk8geI7ZlXP+niVqCEu2YOGI=";
+      };
+
+      guaraguao = fetchTarball {
+        url = "https://github.com/rama-oi/guaraguao/archive/refs/tags/2026.2.tar.gz";
+        sha256 = "0h9z9xbpa2zyps233jd5hiri0wqmjy8fjgr51ir4hsvmjgvbcmpw";
       };
     };
 
@@ -636,10 +674,14 @@ in
     };
   };
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  services.xserver.xkb.extraLayouts.guaraguao = {
+  description = "Guaraguao";
+  languages = [
+    "spa" "fra" "por" "ita" "ron" "cat" "glg" "oci" "srd"
+    "lld" "roh" "ast" "arg" "cos" "wln" "mwl" "rup"
+  ];
+  symbolsFile = "${pombo.app.guaraguao}/xkb/symbols/guaraguao";
+};
 
   # ------ Nix :: experimental features
 
@@ -890,6 +932,12 @@ in
     # Cursor
     seat seat0 xcursor_theme Adwaita 18
 
+    # Keyboard
+    input type:keyboard {
+        xkb_layout us,guaraguao
+        xkb_options grp:win_space_toggle
+    }
+
     # Touchpad
     input type:touchpad {
         tap enabled
@@ -997,6 +1045,7 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
+      "on-click" = "alacritty -e jaiba";
     };
 
     "custom/microphone" = {
@@ -1046,6 +1095,7 @@ in
     "sway/language" = {
       format = "kbd:{short}";
       tooltip = false;
+      "on-click" = "alacritty -e caiman";
     };
 
     backlight = {
@@ -1171,7 +1221,7 @@ in
       "background-color" = theme.current.success;
     };
 
-    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
+    "#network:hover, #custom-bluetooth:hover, #custom-camera:hover, #custom-microphone:hover, #language:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
       {
         "color" = theme.current.bg;
         "background-color" = theme.current.accent20;
