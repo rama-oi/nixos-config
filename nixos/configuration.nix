@@ -73,14 +73,13 @@ let
 
   theme = {
     current = themes.catppuccinMocha // {
-      # accent20 = "#f5c2e7"; # pink
-      accent20 = "#89b4fa"; # blue
+      accent20 = "#f5c2e7"; # pink
+      # accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
       # accent20 = "#89dceb"; # sky
       # accent20 = "#b4befe"; # lavender
-      # accent20 = "#fab387"; # peach
     };
 
     font = {
@@ -119,6 +118,9 @@ let
       btop
       fastfetch
       pombo.desktop.fastfetch
+      pombo.desktop.systemShutdown
+      pombo.desktop.systemReboot
+      pombo.desktop.swayExit
     ];
 
     office = with pkgs; [
@@ -362,6 +364,33 @@ let
     };
 
     desktop = {
+      systemShutdown = pkgs.makeDesktopItem {
+        name = "shutdown";
+        desktopName = "System :: Shutdown";
+        comment = "Shutdown the system";
+        exec = "systemctl poweroff";
+        terminal = false;
+        categories = [ "System" ];
+      };
+
+      systemReboot = pkgs.makeDesktopItem {
+        name = "reboot";
+        desktopName = "System :: Reboot";
+        comment = "Reboot the system";
+        exec = "systemctl reboot";
+        terminal = false;
+        categories = [ "System" ];
+      };
+
+      swayExit = pkgs.makeDesktopItem {
+        name = "sway-exit";
+        desktopName = "System :: Exit Sway";
+        comment = "Exit Sway and return to the terminal";
+        exec = "swaymsg exit";
+        terminal = false;
+        categories = [ "System" ];
+      };
+
       fastfetch = pkgs.makeDesktopItem {
         name = "fastfetch";
         desktopName = "Fastfetch";
@@ -675,13 +704,28 @@ in
   };
 
   services.xserver.xkb.extraLayouts.guaraguao = {
-  description = "Guaraguao";
-  languages = [
-    "spa" "fra" "por" "ita" "ron" "cat" "glg" "oci" "srd"
-    "lld" "roh" "ast" "arg" "cos" "wln" "mwl" "rup"
-  ];
-  symbolsFile = "${pombo.app.guaraguao}/xkb/symbols/guaraguao";
-};
+    description = "Guaraguao";
+    languages = [
+      "spa"
+      "fra"
+      "por"
+      "ita"
+      "ron"
+      "cat"
+      "glg"
+      "oci"
+      "srd"
+      "lld"
+      "roh"
+      "ast"
+      "arg"
+      "cos"
+      "wln"
+      "mwl"
+      "rup"
+    ];
+    symbolsFile = "${pombo.app.guaraguao}/xkb/symbols/guaraguao";
+  };
 
   # ------ Nix :: experimental features
 
@@ -1203,6 +1247,10 @@ in
     "#custom-msg" = {
       color = theme.current.accent10;
       font-weight = "bold";
+    };
+
+    "#language" = {
+      "min-width" = "70px";
     };
 
     "#custom-bluetooth.bt-on, #pulseaudio.muted, #battery.critical, #custom-camera.active, #custom-microphone.active" =
