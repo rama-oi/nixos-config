@@ -88,11 +88,11 @@ let
   theme = {
     current = themes.catppuccinMocha // {
       # accent20 = "#f5c2e7"; # pink
-      accent20 = "#89b4fa"; # blue
+      # accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
-      # accent20 = "#89dceb"; # sky
+      accent20 = "#89dceb"; # sky
       # accent20 = "#b4befe"; # lavender
     };
 
@@ -113,7 +113,6 @@ let
   packages = {
     desktop = with pkgs; [
       waybar
-      wofi
       alacritty
       mako
       swaybg
@@ -124,8 +123,6 @@ let
     themes = with pkgs; [
       dracula-theme
       adwaita-icon-theme
-      # catppuccin-gtk
-      # arc-theme
     ];
 
     system = with pkgs; [
@@ -255,13 +252,11 @@ let
 
     misc = with pkgs; [
       keepassxc
-      rama.app.jaiba
-      rama.app.caiman
-      rama.desktop.caiman
       xkeyboard-config
       libxkbcommon
     ];
 
+    customApps = builtins.attrValues rama.app;
     desktopEntries = builtins.attrValues rama.desktop;
     scripts = builtins.attrValues rama.script;
   };
@@ -289,12 +284,15 @@ let
 
       impala = addDesktopTui "impala";
       bluetui = addDesktopTui "bluetui";
-      resterm = addDesktopTui "resterm";
-      caiman = addDesktopTui "caiman";
       kudu = addDesktopTui "kudu";
+      resterm = addDesktopTui "resterm";
       wiremix = addDesktopTui "wiremix";
       btop = addDesktopTui "btop";
       calcurse = addDesktopTui "calcurse";
+
+      jaiba = addDesktopTui "jaiba";
+      caiman = addDesktopTui "caiman";
+      coqui = addDesktop "coqui" "alacritty -e --class floating-terminal coqui";
     };
 
     script = {
@@ -389,21 +387,16 @@ let
     app = {
       jaiba = pkgs.rustPlatform.buildRustPackage rec {
         pname = "jaiba";
-        version = "2026.4";
+        version = "2026.5";
 
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "jaiba";
-          rev = "2026.4";
-          hash = "sha256-zS2DZDIKU1tO2RlO/le0CE4cmURDurmgo6iFnPPKfsg=";
+          rev = "2026.5";
+          hash = "sha256-NI/HR3SqHB6BfhC6/DvEvUiMKsd2ufx0b1+VFee9Tzc=";
         };
 
-        cargoHash = "sha256-prcEb1A+xHU9w1u1wkp7Q9hMAy7rQ1sey887BMKF4+g=";
-
-        postInstall = ''
-          install -Dm644 assets/jaiba.desktop \
-            $out/share/applications/jaiba.desktop
-        '';
+        cargoHash = "sha256-2KjVqs1oy3T/lCLoftOdkBUkWQ58YstOLt9E8AY5O8Y=";
       };
 
       caiman = pkgs.rustPlatform.buildRustPackage rec {
@@ -414,7 +407,7 @@ let
           owner = "rama-oi";
           repo = "caiman";
           rev = "2026.1";
-          hash = "sha256-a1iYhjLuu8CnJx+Uak29EtwrAtudipjmgNrsFEInvY4=";
+          hash = "sha256-hYYCITxCqLQyu1u39LUIuO/BxhUzFT/NLGjDiZfHgUw=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -431,6 +424,20 @@ let
       carey = fetchTarball {
         url = "https://github.com/rama-oi/carey/archive/refs/tags/2026.2.tar.gz";
         sha256 = "1k6sip49faaj7vl8jx765410b6afwdkbjdyzbcvq7z09ib20mir9";
+      };
+
+      coqui = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "coqui";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "coqui";
+          rev = "2026.1";
+          hash = "sha256-oAF2Bq8xnvDvmNimM8L2J/x8o+zTs2sEDbXIEVeu34o=";
+        };
+
+        cargoHash = "sha256-q9Ab4l9FNHWHS4YJMe0x6p5AvFhOdeLO2mjjqKePrxQ=";
       };
     };
 
@@ -870,88 +877,6 @@ in
   # virtualisation.libvirtd.enable = true;
   # programs.virt-manager.enable = true;
 
-  # ------ Program :: Neovim
-
-  programs.neovim = {
-    enable = true;
-
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-
-    configure = {
-      packages.myPlugins = with pkgs.vimPlugins; {
-        start = [
-          lualine-nvim
-          nvim-web-devicons
-        ];
-      };
-
-      customRC = ''
-        lua << EOF
-        vim.g.mapleader = " "
-
-        -- Indentation
-        vim.opt.expandtab = true
-        vim.opt.tabstop = 2
-        vim.opt.shiftwidth = 2
-        vim.opt.softtabstop = 2
-
-        -- Visible whitespace
-        vim.opt.list = true
-        vim.opt.listchars = "space:·,tab:→ ,trail:~"
-
-        -- Line numbers
-        vim.opt.number = true
-
-        -- Keep cursor away from screen edges
-        vim.opt.scrolloff = 4
-
-        -- Mouse
-        vim.opt.mouse = "a"
-
-        -- Search
-        vim.opt.ignorecase = true
-        vim.opt.smartcase = true
-
-        -- Move lines up/down
-        local opts = {
-          noremap = true,
-          silent = true,
-        }
-
-        vim.keymap.set("n", "<A-Down>", ":m .+1<CR>==", opts)
-        vim.keymap.set("n", "<A-Up>", ":m .-2<CR>==", opts)
-
-        vim.keymap.set("i", "<A-Down>", "<Esc>:m .+1<CR>==gi", opts)
-        vim.keymap.set("i", "<A-Up>", "<Esc>:m .-2<CR>==gi", opts)
-
-        vim.keymap.set("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
-        vim.keymap.set("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
-
-        -- Select all
-        vim.keymap.set("n", "<leader>a", "ggVG", {
-          desc = "Select all",
-        })
-
-        -- Undo / redo
-        vim.keymap.set("n", "<C-z>", "u", opts)
-        vim.keymap.set("n", "<C-y>", "<C-r>", opts)
-
-        -- Lualine
-        require("lualine").setup({
-          options = {
-            theme = "dracula",
-            globalstatus = true,
-            section_separators = "",
-            component_separators = "",
-          },
-        })
-        EOF
-      '';
-    };
-  };
-
   # ------ Program :: Sway
 
   services.xserver.enable = false;
@@ -1013,13 +938,16 @@ in
     bindsym $mod+z exec alacritty
 
     # Application launcher
-    bindsym $mod+space exec wofi
+    bindsym $mod+space exec alacritty --class floating-terminal -e coqui
 
     # Close window
     bindsym $mod+x kill
 
     # Reload Sway
     bindsym $mod+r reload
+
+    # Floating Terminals
+    for_window [app_id="floating-terminal"] floating enable, resize set width 400px height 300px, move position center
 
     # Power
     bindsym $mod+Escape exec swaynag \
@@ -1292,75 +1220,6 @@ in
         "color" = theme.current.bg;
         "background-color" = theme.current.accent20;
       };
-  };
-
-  # ------ Program :: Wofi
-
-  environment.etc."wofi/config".text = ''
-    show=drun
-    term=alacritty
-    prompt=Apps
-    width=400
-    lines=8
-    columns=1
-    allow_images=false
-    hide_scroll=true
-    no_actions=true
-    style=/etc/wofi/catppuccin-mocha.css
-  '';
-
-  environment.etc."wofi/catppuccin-mocha.css".text = parser.css {
-    "#window" = {
-      "background-color" = theme.current.bg;
-      "border" = "0 none";
-      "border-radius" = "0";
-    };
-
-    "#outer-box" = {
-      "padding" = "8px";
-      "background-color" = theme.current.bg;
-      "border" = "1px solid ${theme.current.accent20}";
-      "font-size" = "${theme.font.size}px";
-      "font-family" = "\"${theme.font.family}\"";
-    };
-
-    "#input" = {
-      "background-color" = theme.current.bgAlt;
-      "color" = theme.current.fg;
-      "padding" = "0 ${theme.spacing.md}px";
-      "border" = "none";
-      "border-radius" = "0";
-      "box-shadow" = "none";
-    };
-
-    "#scroll" = {
-      "margin-top" = "${theme.spacing.md}px";
-    };
-
-    "#inner-box" = {
-      "background-color" = "transparent";
-    };
-
-    "#entry" = {
-      "padding" = "${theme.spacing.md}px";
-      "margin" = "1px 0";
-      "background-color" = "transparent";
-      "color" = theme.current.fg;
-      "border-radius" = "0";
-    };
-
-    "#entry:selected" = {
-      "background-color" = theme.current.accent10;
-      "outline" = "none";
-    };
-
-    "#entry:selected #text" = {
-      "color" = theme.current.bg;
-    };
-
-    "#text" = {
-      "color" = theme.current.fg;
-    };
   };
 
   # ------ Program :: Mako
