@@ -36,16 +36,14 @@ let
     name: exec:
     pkgs.makeDesktopItem {
       inherit name;
-      desktopName = name;
+      desktopName = "* ${name}";
       comment = "";
       inherit exec;
       terminal = false;
       categories = [ "Utility" ];
     };
 
-    addDesktopTui =
-    name: exec ? name:
-    addDesktop name "alacritty -e ${exec}";
+  addDesktopTui = name: addDesktop name "alacritty -e ${name}";
 
   # ------ Vars :: Themes
 
@@ -264,27 +262,8 @@ let
       libxkbcommon
     ];
 
-    desktopEntries = with pkgs; [
-      rama.desktop.impala
-      rama.desktop.bluetui
-      rama.desktop.wiremix
-      rama.desktop.resterm
-      rama.desktop.fastfetch
-      rama.desktop.systemShutdown
-      rama.desktop.systemReboot
-      rama.desktop.swayExit
-      rama.desktop.btop
-    ];
-
-    scripts = with pkgs; [
-      rama.script.batteryMonitor
-      rama.script.toggleSignals
-      rama.script.waybarBluetooth
-      rama.script.waybarCamera
-      rama.script.waybarMicrophone
-      rama.script.fastfetchLaunch
-      # rama.script.waybarQuote
-    ];
+    desktopEntries = builtins.attrValues rama.desktop;
+    scripts = builtins.attrValues rama.script;
   };
 
   # ------ Vars :: Sway
@@ -301,6 +280,23 @@ let
   # ------ Custom Scripts
 
   rama = {
+    desktop = {
+      systemShutdown = addDesktop "shutdown" "systemctl poweroff";
+      systemReboot = addDesktop "reboot" "systemctl reboot";
+      swayExit = addDesktop "sway-exit" "swaymsg exit";
+
+      fastfetch = addDesktop "fastfetch" "alacritty -e ${rama.script.fastfetchLaunch}/bin/fastfetch-launch";
+
+      impala = addDesktopTui "impala";
+      bluetui = addDesktopTui "bluetui";
+      resterm = addDesktopTui "resterm";
+      caiman = addDesktopTui "caiman";
+      kudu = addDesktopTui "kudu";
+      wiremix = addDesktopTui "wiremix";
+      btop = addDesktopTui "btop";
+      calcurse = addDesktopTui "calcurse";
+    };
+
     script = {
       # waybarQuote = pkgs.writeShellScriptBin "rama-waybar-quote" ''
       #   quotes=(
@@ -388,23 +384,6 @@ let
         fastfetch
         exec "$SHELL"
       '';
-    };
-
-    desktop = {
-      fastfetch = addDesktopTui "fastfetch";
-      impala = addDesktopTui "impala";
-      bluetui = addDesktopTui "bluetui";
-      resterm = addDesktopTui "resterm";
-      nvim = addDesktopTui "nvim";
-      caiman = addDesktopTui "caiman";
-      kudu = addDesktopTui "kudu";
-      wiremix = addDesktopTui "wiremix";
-      btop = addDesktopTui "btop";
-      calcurse = addDesktopTui "calcurse";
-
-      systemShutdown = addDesktop "shutdown" "systemctl poweroff";
-      systemReboot = addDesktop "reboot" "systemctl reboot";
-      swayExit = addDesktop "sway-exit" "swaymsg exit";    
     };
 
     app = {
