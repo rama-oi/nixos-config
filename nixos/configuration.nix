@@ -31,6 +31,22 @@ let
     # toml = { };
   };
 
+  # ------ Parsers :: Desktop
+  addDesktop =
+    name: exec:
+    pkgs.makeDesktopItem {
+      inherit name;
+      desktopName = name;
+      comment = "";
+      inherit exec;
+      terminal = false;
+      categories = [ "Utility" ];
+    };
+
+    addDesktopTui =
+    name: exec ? name:
+    addDesktop name "alacritty -e ${exec}";
+
   # ------ Vars :: Themes
 
   bashColors = {
@@ -73,8 +89,8 @@ let
 
   theme = {
     current = themes.catppuccinMocha // {
-      accent20 = "#f5c2e7"; # pink
-      # accent20 = "#89b4fa"; # blue
+      # accent20 = "#f5c2e7"; # pink
+      accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
@@ -115,15 +131,15 @@ let
     ];
 
     system = with pkgs; [
-      pombo.appC.fastfetch
-      pombo.appCpp.btop
+      rama.appC.fastfetch
+      rama.appCpp.btop
     ];
 
     office = with pkgs; [
       calcurse
       yazi
 
-      pombo.desktop.calcurse
+      rama.desktop.calcurse
     ];
 
     commandUtils = with pkgs; [
@@ -153,9 +169,9 @@ let
       bluez
       wiremix
 
-      pombo.appGo.resterm
-      pombo.appRust.impala
-      pombo.appRust.bluetui
+      rama.appGo.resterm
+      rama.appRust.impala
+      rama.appRust.bluetui
     ];
 
     development = with pkgs; [
@@ -165,7 +181,7 @@ let
       github-desktop
       nixfmt
 
-      pombo.appGo.lazygit
+      rama.appGo.lazygit
     ];
 
     developmentRust = with pkgs; [
@@ -200,7 +216,7 @@ let
       qemu_kvm
       xorriso
       tigervnc
-      pombo.appRust.kudu
+      rama.appRust.kudu
     ];
 
     creative = with pkgs; [
@@ -241,33 +257,33 @@ let
 
     misc = with pkgs; [
       keepassxc
-      pombo.app.jaiba
-      pombo.app.caiman
-      pombo.desktop.caiman
+      rama.app.jaiba
+      rama.app.caiman
+      rama.desktop.caiman
       xkeyboard-config
       libxkbcommon
     ];
 
     desktopEntries = with pkgs; [
-      pombo.desktop.impala
-      pombo.desktop.bluetui
-      pombo.desktop.wiremix
-      pombo.desktop.resterm
-      pombo.desktop.fastfetch
-      pombo.desktop.systemShutdown
-      pombo.desktop.systemReboot
-      pombo.desktop.swayExit
-      pombo.desktop.btop
+      rama.desktop.impala
+      rama.desktop.bluetui
+      rama.desktop.wiremix
+      rama.desktop.resterm
+      rama.desktop.fastfetch
+      rama.desktop.systemShutdown
+      rama.desktop.systemReboot
+      rama.desktop.swayExit
+      rama.desktop.btop
     ];
 
     scripts = with pkgs; [
-      pombo.script.batteryMonitor
-      pombo.script.toggleSignals
-      pombo.script.waybarBluetooth
-      pombo.script.waybarCamera
-      pombo.script.waybarMicrophone
-      pombo.script.fastfetchLaunch
-      # pombo.script.waybarQuote
+      rama.script.batteryMonitor
+      rama.script.toggleSignals
+      rama.script.waybarBluetooth
+      rama.script.waybarCamera
+      rama.script.waybarMicrophone
+      rama.script.fastfetchLaunch
+      # rama.script.waybarQuote
     ];
   };
 
@@ -284,9 +300,9 @@ let
 
   # ------ Custom Scripts
 
-  pombo = {
+  rama = {
     script = {
-      # waybarQuote = pkgs.writeShellScriptBin "pombo-waybar-quote" ''
+      # waybarQuote = pkgs.writeShellScriptBin "rama-waybar-quote" ''
       #   quotes=(
       #     "be the problem you want to see in the world"
       #     "the horrors persist, but so do i"
@@ -299,7 +315,7 @@ let
       #   printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
       # '';
 
-      waybarBluetooth = pkgs.writeShellScriptBin "pombo-waybar-bluetooth" ''
+      waybarBluetooth = pkgs.writeShellScriptBin "rama-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
           printf '{"text":"bt:1","class":"bt-on"}'
         else
@@ -307,7 +323,7 @@ let
         fi
       '';
 
-      waybarCamera = pkgs.writeShellScriptBin "pombo-waybar-camera" ''
+      waybarCamera = pkgs.writeShellScriptBin "rama-waybar-camera" ''
         if ls /dev/video* >/dev/null 2>&1; then
           printf '{"text":"cam:1","class":"active"}'
         else
@@ -315,7 +331,7 @@ let
         fi
       '';
 
-      waybarMicrophone = pkgs.writeShellScriptBin "pombo-waybar-microphone" ''
+      waybarMicrophone = pkgs.writeShellScriptBin "rama-waybar-microphone" ''
         mic=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ 2>/dev/null)
 
         if echo "$mic" | grep -q MUTED; then
@@ -325,7 +341,7 @@ let
         fi
       '';
 
-      toggleSignals = pkgs.writeShellScriptBin "pombo-toggle-signals" ''
+      toggleSignals = pkgs.writeShellScriptBin "rama-toggle-signals" ''
         wifi=$(iwctl device wlan0 show 2>/dev/null | awk '/Powered/ {print $NF}')
           if [ "$wifi" = "on" ]; then
             iwctl device wlan0 set-property Powered off
@@ -337,7 +353,7 @@ let
           fi
       '';
 
-      batteryMonitor = pkgs.writeShellScriptBin "pombo-battery-monitor" ''
+      batteryMonitor = pkgs.writeShellScriptBin "rama-battery-monitor" ''
         BATTERY="/sys/class/power_supply/BAT0"
         THRESHOLD=10
         STATE_FILE="''${XDG_RUNTIME_DIR}/battery-notified"
@@ -375,136 +391,20 @@ let
     };
 
     desktop = {
-      systemShutdown = pkgs.makeDesktopItem {
-        name = "shutdown";
-        desktopName = "System :: Shutdown";
-        comment = "Shutdown the system";
-        exec = "systemctl poweroff";
-        terminal = false;
-        categories = [ "System" ];
-      };
+      fastfetch = addDesktopTui "fastfetch";
+      impala = addDesktopTui "impala";
+      bluetui = addDesktopTui "bluetui";
+      resterm = addDesktopTui "resterm";
+      nvim = addDesktopTui "nvim";
+      caiman = addDesktopTui "caiman";
+      kudu = addDesktopTui "kudu";
+      wiremix = addDesktopTui "wiremix";
+      btop = addDesktopTui "btop";
+      calcurse = addDesktopTui "calcurse";
 
-      systemReboot = pkgs.makeDesktopItem {
-        name = "reboot";
-        desktopName = "System :: Reboot";
-        comment = "Reboot the system";
-        exec = "systemctl reboot";
-        terminal = false;
-        categories = [ "System" ];
-      };
-
-      swayExit = pkgs.makeDesktopItem {
-        name = "sway-exit";
-        desktopName = "System :: Exit Sway";
-        comment = "Exit Sway and return to the terminal";
-        exec = "swaymsg exit";
-        terminal = false;
-        categories = [ "System" ];
-      };
-
-      fastfetch = pkgs.makeDesktopItem {
-        name = "fastfetch";
-        desktopName = "Fastfetch";
-        comment = "System information TUI";
-        exec = "alacritty -e ${pombo.script.fastfetchLaunch}/bin/fastfetch-launch";
-        terminal = false;
-        categories = [ "System" ];
-      };
-
-      impala = pkgs.makeDesktopItem {
-        name = "impala";
-        desktopName = "Impala";
-        comment = "Wi-Fi TUI";
-        exec = "alacritty -e impala";
-        terminal = false;
-        categories = [ "Network" ];
-      };
-
-      bluetui = pkgs.makeDesktopItem {
-        name = "bluetui";
-        desktopName = "Bluetui";
-        comment = "Bluetooth TUI";
-        exec = "alacritty -e bluetui";
-        terminal = false;
-        categories = [ "Network" ];
-      };
-
-      resterm = pkgs.makeDesktopItem {
-        name = "resterm";
-        desktopName = "Resterm";
-        comment = "API client for REST, GraphQL, gRPC, WebSocket and SSE";
-        exec = "alacritty -e resterm";
-        terminal = false;
-        categories = [ "Development" ];
-      };
-
-      neovim = pkgs.makeDesktopItem {
-        name = "neovim";
-        desktopName = "Neovim";
-        comment = "Text Editor TUI";
-        exec = "alacritty -e nvim";
-        terminal = false;
-        categories = [
-          "Development"
-        ];
-      };
-
-      wiremix = pkgs.makeDesktopItem {
-        name = "wiremix";
-        desktopName = "Wiremix";
-        comment = "PipeWire audio mixer";
-        exec = "alacritty -e wiremix";
-        terminal = false;
-        categories = [
-          "AudioVideo"
-          "Audio"
-        ];
-      };
-
-      calcurse = pkgs.makeDesktopItem {
-        name = "calcurse";
-        desktopName = "Calcurse";
-        comment = "Calendar and scheduling TUI";
-        exec = "alacritty -e calcurse";
-        terminal = false;
-        categories = [
-          "Office"
-          "Calendar"
-        ];
-      };
-
-      caiman = pkgs.makeDesktopItem {
-        name = "caiman";
-        desktopName = "Caiman";
-        comment = "Keyboard Layout TUI";
-        exec = "alacritty -e caiman";
-        terminal = false;
-        categories = [
-          "Utility"
-        ];
-      };
-
-      btop = pkgs.makeDesktopItem {
-        name = "btop";
-        desktopName = "btop++";
-        comment = "Task Manager TUI";
-        exec = "alacritty -e btop";
-        terminal = false;
-        categories = [
-          "System"
-        ];
-      };
-
-      kudu = pkgs.makeDesktopItem {
-        name = "kudu";
-        desktopName = "Kudu";
-        comment = "Easily manage VMs on Linux";
-        exec = "alacritty -e kudu";
-        terminal = false;
-        categories = [
-          "Utility"
-        ];
-      };
+      systemShutdown = addDesktop "shutdown" "systemctl poweroff";
+      systemReboot = addDesktop "reboot" "systemctl reboot";
+      swayExit = addDesktop "sway-exit" "swaymsg exit";    
     };
 
     app = {
@@ -535,7 +435,7 @@ let
           owner = "rama-oi";
           repo = "caiman";
           rev = "2026.1";
-          hash = "sha256-oIhptAYvfNqoo2s4uOcPFXHVp7A2j/9/mGyU6vSXXyc=";
+          hash = "sha256-a1iYhjLuu8CnJx+Uak29EtwrAtudipjmgNrsFEInvY4=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -549,9 +449,9 @@ let
         cargoHash = "sha256-mnjFMmwAyKkFA7uLl4Xdk8geI7ZlXP+niVqCEu2YOGI=";
       };
 
-      guaraguao = fetchTarball {
-        url = "https://github.com/rama-oi/guaraguao/archive/refs/tags/2026.2.tar.gz";
-        sha256 = "0h9z9xbpa2zyps233jd5hiri0wqmjy8fjgr51ir4hsvmjgvbcmpw";
+      carey = fetchTarball {
+        url = "https://github.com/rama-oi/carey/archive/refs/tags/2026.2.tar.gz";
+        sha256 = "1k6sip49faaj7vl8jx765410b6afwdkbjdyzbcvq7z09ib20mir9";
       };
     };
 
@@ -713,11 +613,11 @@ let
   androidSdk = androidComposition.androidsdk;
 
   # ------ GRUB :: Catppuccin Mocha Theme
-  grubTheme = pkgs.runCommand "pombo-grub-theme" { } ''
+  grubTheme = pkgs.runCommand "rama-grub-theme" { } ''
     mkdir -p $out
 
     cat > $out/theme.txt <<'EOF'
-    # Pombo GRUB Theme
+    # rama GRUB Theme
     # Catppuccin Mocha
 
     title-text: ""
@@ -842,8 +742,8 @@ in
     };
   };
 
-  services.xserver.xkb.extraLayouts.guaraguao = {
-    description = "Guaraguao";
+  services.xserver.xkb.extraLayouts.carey = {
+    description = "carey";
     languages = [
       "spa"
       "fra"
@@ -863,7 +763,7 @@ in
       "mwl"
       "rup"
     ];
-    symbolsFile = "${pombo.app.guaraguao}/xkb/symbols/guaraguao";
+    symbolsFile = "${rama.app.carey}/xkb/symbols/carey";
   };
 
   # ------ Nix :: experimental features
@@ -1094,7 +994,7 @@ in
 
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
-    exec pombo-battery-monitor
+    exec rama-battery-monitor
     exec bluetoothctl power off
     exec swaybg -c '${theme.current.accent20}'
 
@@ -1117,7 +1017,7 @@ in
 
     # Keyboard
     input type:keyboard {
-        xkb_layout us,guaraguao
+        xkb_layout us,carey
         xkb_options grp:win_space_toggle
     }
 
@@ -1168,7 +1068,7 @@ in
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 1%+
 
     # Touchpad toggle
-    bindsym --locked XF86TouchpadToggle exec pombo-toggle-signals
+    bindsym --locked XF86TouchpadToggle exec rama-toggle-signals
 
     # Screenshot
     bindsym Print exec grim -g "$(slurp)" - | wl-copy
@@ -1217,13 +1117,13 @@ in
     ];
 
     # "custom/msg" = {
-    #   exec = "${pombo.script.waybarQuote}/bin/pombo-waybar-quote";
+    #   exec = "${rama.script.waybarQuote}/bin/rama-waybar-quote";
     #   format = ":: {} ::";
     #   tooltip = false;
     # };
 
     "custom/camera" = {
-      exec = "${pombo.script.waybarCamera}/bin/pombo-waybar-camera";
+      exec = "${rama.script.waybarCamera}/bin/rama-waybar-camera";
       interval = 2;
       "return-type" = "json";
       format = "{}";
@@ -1232,7 +1132,7 @@ in
     };
 
     "custom/microphone" = {
-      exec = "${pombo.script.waybarMicrophone}/bin/pombo-waybar-microphone";
+      exec = "${rama.script.waybarMicrophone}/bin/rama-waybar-microphone";
       interval = 2;
       "return-type" = "json";
       format = "{}";
@@ -1267,7 +1167,7 @@ in
     };
 
     "custom/bluetooth" = {
-      exec = "${pombo.script.waybarBluetooth}/bin/pombo-waybar-bluetooth";
+      exec = "${rama.script.waybarBluetooth}/bin/rama-waybar-bluetooth";
       interval = 5;
       "return-type" = "json";
       format = "{}";
