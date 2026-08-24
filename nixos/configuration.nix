@@ -89,7 +89,7 @@ let
 
     spacing = {
       sm = "4";
-      normal = "8";
+      md = "8";
       lg = "16";
     };
   };
@@ -115,12 +115,8 @@ let
     ];
 
     system = with pkgs; [
-      btop
-      fastfetch
-      pombo.desktop.fastfetch
-      pombo.desktop.systemShutdown
-      pombo.desktop.systemReboot
-      pombo.desktop.swayExit
+      pombo.appC.fastfetch
+      pombo.appCpp.btop
     ];
 
     office = with pkgs; [
@@ -155,15 +151,11 @@ let
 
     networking = with pkgs; [
       bluez
-      impala
-      bluetui
       wiremix
-      resterm
 
-      pombo.desktop.impala
-      pombo.desktop.bluetui
-      pombo.desktop.wiremix
-      pombo.desktop.resterm
+      pombo.appGo.resterm
+      pombo.appRust.impala
+      pombo.appRust.bluetui
     ];
 
     development = with pkgs; [
@@ -171,8 +163,9 @@ let
       vscodium
       nodejs_26
       github-desktop
-      lazygit
       nixfmt
+
+      pombo.appGo.lazygit
     ];
 
     developmentRust = with pkgs; [
@@ -201,6 +194,13 @@ let
 
     containers = with pkgs; [
       docker
+    ];
+
+    containersKudu = with pkgs; [
+      qemu_kvm
+      xorriso
+      tigervnc
+      pombo.appRust.kudu
     ];
 
     creative = with pkgs; [
@@ -246,10 +246,21 @@ let
       pombo.desktop.caiman
       xkeyboard-config
       libxkbcommon
-      # pombo.appGo.vex-tui
     ];
 
-    pombo = with pkgs; [
+    desktopEntries = with pkgs; [
+      pombo.desktop.impala
+      pombo.desktop.bluetui
+      pombo.desktop.wiremix
+      pombo.desktop.resterm
+      pombo.desktop.fastfetch
+      pombo.desktop.systemShutdown
+      pombo.desktop.systemReboot
+      pombo.desktop.swayExit
+      pombo.desktop.btop
+    ];
+
+    scripts = with pkgs; [
       pombo.script.batteryMonitor
       pombo.script.toggleSignals
       pombo.script.waybarBluetooth
@@ -472,6 +483,28 @@ let
           "Utility"
         ];
       };
+
+      btop = pkgs.makeDesktopItem {
+        name = "btop";
+        desktopName = "btop++";
+        comment = "Task Manager TUI";
+        exec = "alacritty -e btop";
+        terminal = false;
+        categories = [
+          "System"
+        ];
+      };
+
+      kudu = pkgs.makeDesktopItem {
+        name = "kudu";
+        desktopName = "Kudu";
+        comment = "Easily manage VMs on Linux";
+        exec = "alacritty -e kudu";
+        terminal = false;
+        categories = [
+          "Utility"
+        ];
+      };
     };
 
     app = {
@@ -522,21 +555,127 @@ let
       };
     };
 
-    # appGo = {
-    #   vex-tui = pkgs.buildGoModule rec {
-    #     pname = "vex-tui";
-    #     version = "2.1.0";
+    appRust = {
+      impala = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "impala";
+        version = "v0.7.4";
 
-    #     src = pkgs.fetchFromGitHub {
-    #       owner = "CodeOne45";
-    #       repo = "vex-tui";
-    #       rev = "v2.1.0";
-    #       hash = "sha256-wmze6OkX8Oxm+HtHBWo1+oSVDUR4PWWTTW/Ldu5z8pc=";
-    #     };
+        src = pkgs.fetchFromGitHub {
+          owner = "pythops";
+          repo = "impala";
+          rev = "v0.7.4";
+          hash = "sha256-GQg/1asi+6hTyOK4cWkAvFJhnWTewFUOn7fAlL+tkUo=";
+        };
 
-    #     vendorHash = "sha256-jE53+VEjj5E5G2Yycwb8NDA8vDtoUtarrQgZ9ULyVh0=";
-    #   };
-    # };
+        cargoHash = "sha256-shIv6fjWAZhIeSzxcHfzxfg2brTP1G3MBAixdi0GoK4=";
+      };
+
+      bluetui = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "bluetui";
+        version = "v0.8.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "pythops";
+          repo = "bluetui";
+          rev = "v0.8.1";
+          hash = "sha256-K+QAU9/XdGZonsKjBXbPbpJhWIHyaqxP6eb670n81LU=";
+        };
+
+        cargoHash = "sha256-i77j7hKtVxDDiHEBz5E7iwGXWYg0f/NfwFnN71QfgPU=";
+      };
+
+      kudu = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "kudu";
+        version = "v0.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "pythops";
+          repo = "kudu";
+          rev = "v0.1";
+          hash = "sha256-F6/8FVb/TrpWgh4xgHEdnR/fAb5SjTsF/cn36u5mqm8=";
+        };
+
+        cargoHash = "sha256-ie2wA+YenBRPRI90Km/9qEaP/6NvWVZgYBbSWDpC+Lw=";
+      };
+    };
+
+    appGo = {
+      resterm = pkgs.buildGoModule rec {
+        pname = "resterm";
+        version = "v1.2.4";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "unkn0wn-root";
+          repo = "resterm";
+          rev = "v1.2.4";
+          hash = "sha256-vp1/yWDqx8fQp4NifjENr/x8e0TVSRlLYv7TshfwC2Y=";
+        };
+
+        vendorHash = "sha256-AYe9qB4t1ocL3qQpwXz1Rm91q238rD68ewcwjUxO9nM=";
+      };
+
+      lazygit = pkgs.buildGoModule rec {
+        pname = "lazygit";
+        version = "v0.64.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "jesseduffield";
+          repo = "lazygit";
+          rev = "v0.64.1";
+          hash = "sha256-UYyIrSHk+efKvHvxQs7FsOGA7e0uM9mg+1O1WRJIeEU=";
+        };
+
+        vendorHash = null;
+
+        nativeCheckInputs = [
+          pkgs.gitMinimal
+        ];
+
+        doCheck = false;
+      };
+    };
+
+    appCpp = {
+      btop = pkgs.stdenv.mkDerivation rec {
+        pname = "btop";
+        version = "1.4.7";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "aristocratos";
+          repo = "btop";
+          rev = "v${version}";
+          hash = "sha256-3gECGBSWcGTYQkUlD4X2zrxZVvH2x2xfh5zdZ2jJbDQ=";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          gnumake
+        ];
+
+        installPhase = ''
+          mkdir -p $out/bin
+          cp bin/btop $out/bin/
+        '';
+      };
+    };
+
+    appC = {
+      fastfetch = pkgs.stdenv.mkDerivation rec {
+        pname = "fastfetch";
+        version = "2.67.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "fastfetch-cli";
+          repo = "fastfetch";
+          rev = "4dd2f2d";
+          hash = "sha256-o4jjRkwrsfnnKiXxJZhTevw5x5zoXAn3XNprxEFWMmU=";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          cmake
+          pkg-config
+        ];
+      };
+    };
   };
 
   # ------ Android SDK
@@ -988,7 +1127,7 @@ in
     }
 
     # Gaps
-    gaps inner ${theme.spacing.normal}
+    gaps inner ${theme.spacing.md}
     gaps outer ${theme.spacing.sm}
 
     # Terminal
@@ -1054,7 +1193,7 @@ in
     layer = "top";
     position = "top";
     height = 26;
-    spacing = theme.spacing.normal;
+    spacing = theme.spacing.md;
 
     "modules-left" = [
       "sway/workspaces"
@@ -1209,14 +1348,14 @@ in
     "#taskbar" = {
       "background-color" = theme.current.bgAlt;
       "border-radius" = "25px";
-      "padding" = "0px ${theme.spacing.normal}px";
+      "padding" = "0px ${theme.spacing.md}px";
       "margin" = "0 ${theme.spacing.sm}px";
     };
 
     "button label, #taskbar button, label" = {
       "color" = theme.current.muted;
       "border" = "none";
-      "padding" = "0px ${theme.spacing.normal}px";
+      "padding" = "0px ${theme.spacing.md}px";
       "margin" = "${theme.spacing.sm}px";
       "border-radius" = "25px";
       "font-weight" = "bold";
@@ -1309,14 +1448,14 @@ in
     "#input" = {
       "background-color" = theme.current.bgAlt;
       "color" = theme.current.fg;
-      "padding" = "0 ${theme.spacing.normal}px";
+      "padding" = "0 ${theme.spacing.md}px";
       "border" = "none";
       "border-radius" = "0";
       "box-shadow" = "none";
     };
 
     "#scroll" = {
-      "margin-top" = "${theme.spacing.normal}px";
+      "margin-top" = "${theme.spacing.md}px";
     };
 
     "#inner-box" = {
@@ -1324,7 +1463,7 @@ in
     };
 
     "#entry" = {
-      "padding" = "${theme.spacing.normal}px";
+      "padding" = "${theme.spacing.md}px";
       "margin" = "1px 0";
       "background-color" = "transparent";
       "color" = theme.current.fg;
