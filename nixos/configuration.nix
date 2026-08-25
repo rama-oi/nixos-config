@@ -921,6 +921,9 @@ in
 
     include /etc/sway/config.d/*
 
+    default_orientation auto
+    bindsym $mod+v splitv
+
     # Startup
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
     exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
