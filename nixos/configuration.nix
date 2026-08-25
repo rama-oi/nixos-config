@@ -179,6 +179,10 @@ let
       rama.appGo.lazygit
     ];
 
+    developmentSql = with pkgs; [
+      postgresql
+    ];
+
     developmentRust = with pkgs; [
       rustc
       cargo
@@ -292,7 +296,7 @@ let
 
       jaiba = addDesktopTui "jaiba";
       caiman = addDesktopTui "caiman";
-      coqui = addDesktop "coqui" "alacritty -e --class floating-terminal coqui";
+      coqui = addDesktop "coqui" "${rama.script.coquiLaunch}/bin/rama-coqui-launch";
     };
 
     script = {
@@ -381,6 +385,14 @@ let
       fastfetchLaunch = pkgs.writeShellScriptBin "fastfetch-launch" ''
         fastfetch
         exec "$SHELL"
+      '';
+
+      coquiLaunch = pkgs.writeShellScriptBin "rama-coqui-launch" ''
+        if swaymsg '[app_id="^floating-terminal$"] focus' >/dev/null 2>&1; then
+          exit 0
+        fi
+
+        exec alacritty --class floating-terminal -e coqui
       '';
     };
 
@@ -752,6 +764,23 @@ in
     symbolsFile = "${rama.app.carey}/xkb/symbols/carey";
   };
 
+  # ------ Services :: PostgreSQL
+
+  services.postgresql = {
+    enable = true;
+
+    ensureDatabases = [
+      "iqra"
+    ];
+
+    ensureUsers = [
+      {
+        name = "iqra";
+        ensureDBOwnership = true;
+      }
+    ];
+  };
+
   # ------ Nix :: experimental features
 
   nix.settings.experimental-features = [
@@ -921,8 +950,7 @@ in
 
     # Keyboard
     input type:keyboard {
-        xkb_layout us,carey
-        xkb_options grp:win_space_toggle
+        xkb_layout carey
     }
 
     # Touchpad
@@ -938,7 +966,7 @@ in
     bindsym $mod+z exec alacritty
 
     # Application launcher
-    bindsym $mod+space exec alacritty --class floating-terminal -e coqui
+    bindsym $mod+space exec rama-coqui-launch
 
     # Close window
     bindsym $mod+x kill
