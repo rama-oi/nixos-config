@@ -92,8 +92,8 @@ let
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
-      accent20 = "#89dceb"; # sky
-      # accent20 = "#b4befe"; # lavender
+      # accent20 = "#89dceb"; # sky
+      accent20 = "#b4befe"; # lavender
     };
 
     font = {
@@ -132,7 +132,7 @@ let
 
     office = with pkgs; [
       calcurse
-      yazi
+      # yazi
 
       rama.desktop.calcurse
     ];
@@ -151,7 +151,6 @@ let
       curl
       unzip
       zip
-      bat
     ];
 
     browsers = with pkgs; [
@@ -294,9 +293,8 @@ let
       btop = addDesktopTui "btop";
       calcurse = addDesktopTui "calcurse";
 
-      jaiba = addDesktopTui "jaiba";
+      jaiba = addDesktop "jaiba" "alacritty --class floating-terminal -e jaiba --slim";
       caiman = addDesktopTui "caiman";
-      coqui = addDesktop "coqui" "${rama.script.coquiLaunch}/bin/rama-coqui-launch";
     };
 
     script = {
@@ -399,16 +397,16 @@ let
     app = {
       jaiba = pkgs.rustPlatform.buildRustPackage rec {
         pname = "jaiba";
-        version = "2026.5";
+        version = "2026.7";
 
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "jaiba";
-          rev = "2026.5";
-          hash = "sha256-NI/HR3SqHB6BfhC6/DvEvUiMKsd2ufx0b1+VFee9Tzc=";
+          rev = "2026.7";
+          hash = "sha256-oCdk8gB+5Siu3BNSpzhLC+mBtTJG7niomAb6MYTxJK0=";
         };
 
-        cargoHash = "sha256-2KjVqs1oy3T/lCLoftOdkBUkWQ58YstOLt9E8AY5O8Y=";
+        cargoHash = "sha256-6rlpLP5q7AtHGMyh2U7cmIt+4f40AGgg0GJiV9ODDso=";
       };
 
       caiman = pkgs.rustPlatform.buildRustPackage rec {
@@ -921,9 +919,6 @@ in
 
     include /etc/sway/config.d/*
 
-    default_orientation auto
-    bindsym $mod+v splitv
-
     # Startup
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
     exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
@@ -1066,7 +1061,6 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
-      "on-click" = "alacritty -e jaiba";
     };
 
     "custom/microphone" = {
@@ -1305,7 +1299,6 @@ in
       mv = "mv -i";
       mkdir = "mkdir -p";
       ".." = "cd ..";
-      cat = "bat";
     };
 
     promptInit = ''
