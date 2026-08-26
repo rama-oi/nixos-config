@@ -293,7 +293,8 @@ let
       btop = addDesktopTui "btop";
       calcurse = addDesktopTui "calcurse";
 
-      jaiba = addDesktop "jaiba" "alacritty --class floating-terminal -e jaiba --slim";
+      jaiba = addDesktopTui "jaiba";
+      jaiba_slim = addDesktop "jaiba-slim" "alacritty --class floating-terminal -e jaiba --slim";
       caiman = addDesktopTui "caiman";
     };
 
@@ -1240,7 +1241,7 @@ in
       "background-color" = theme.current.success;
     };
 
-    "#network:hover, #custom-bluetooth:hover, #custom-camera:hover, #custom-microphone:hover, #language:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
+    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #language:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
       {
         "color" = theme.current.bg;
         "background-color" = theme.current.accent20;
