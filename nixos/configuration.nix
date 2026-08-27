@@ -31,20 +31,6 @@ let
     # toml = { };
   };
 
-  # ------ Parsers :: Desktop
-  addDesktop =
-    name: exec:
-    pkgs.makeDesktopItem {
-      inherit name;
-      desktopName = "* ${name}";
-      comment = "";
-      inherit exec;
-      terminal = false;
-      categories = [ "Utility" ];
-    };
-
-  addDesktopTui = name: addDesktop name "alacritty -e ${name}";
-
   # ------ Vars :: Themes
 
   bashColors = {
@@ -133,8 +119,6 @@ let
     office = with pkgs; [
       calcurse
       # yazi
-
-      rama.desktop.calcurse
     ];
 
     commandUtils = with pkgs; [
@@ -199,6 +183,7 @@ let
       android-studio
       androidSdk
       android-tools
+      universal-android-debloater
     ];
 
     developmentAndroidSamsung = with pkgs; [
@@ -208,6 +193,8 @@ let
 
     containers = with pkgs; [
       docker
+
+      rama.appRust.oxker
     ];
 
     containersKudu = with pkgs; [
@@ -226,6 +213,7 @@ let
       imagemagick
       darktable
       imv
+      cmus
 
       # oxipng
       # pngquant
@@ -260,7 +248,6 @@ let
     ];
 
     customApps = builtins.attrValues rama.app;
-    desktopEntries = builtins.attrValues rama.desktop;
     scripts = builtins.attrValues rama.script;
   };
 
@@ -275,29 +262,134 @@ let
     '') workspaces
   );
 
+  # ------ Home Config
+
+  coquiConfig = pkgs.writeText "coqui_config.toml" ''
+    theme = "nixos"
+
+    [[command]]
+    label = "Jaiba Slim"
+    cmd = "alacritty --class floating-terminal -e jaiba --slim"
+    description = "TUI Password manager"
+
+    [[command]]
+    label = "Impala"
+    cmd = "alacritty -e impala"
+    description = ""
+
+    [[command]]
+    label = "Bluetui"
+    cmd = "alacritty -e bluetui"
+    description = ""
+
+    [[command]]
+    label = "Kudu"
+    cmd = "alacritty -e kudu"
+    description = ""
+
+    [[command]]
+    label = "ResTerm"
+    cmd = "alacritty -e resterm"
+    description = ""
+
+    [[command]]
+    label = "Oxker"
+    cmd = "alacritty -e oxker"
+    description = ""
+
+    [[command]]
+    label = "Wiremix"
+    cmd = "alacritty -e wiremix"
+    description = ""
+
+    [[command]]
+    label = "Btop"
+    cmd = "alacritty -e btop"
+    description = ""
+
+    [[command]]
+    label = "Cmus"
+    cmd = "alacritty -e cmus"
+    description = ""
+
+    [[command]]
+    label = "Caiman"
+    cmd = "alacritty -e caiman"
+    description = ""
+
+    [[command]]
+    label = "Fastfetch"
+    cmd = "alacritty -e fastfetch-launch"
+    description = ""
+
+    [[command]]
+    label = "Universal Android Debloater"
+    cmd = "uad-ng"
+    description = ""
+
+    [[command]]
+    label = "Calcurse"
+    cmd = "alacritty -e calcurse"
+    description = ""
+
+    [[command]]
+    label = "Jaiba"
+    cmd = "alacritty -e jaiba"
+    description = "TUI Password manager"
+
+    [[command]]
+    label = "-"
+
+    [[command]]
+    label = "Sway Exit"
+    cmd = "swaymsg exit"
+    description = ""
+
+    [[command]]
+    label = "Reboot"
+    cmd = "systemctl reboot"
+    description = ""
+
+    [[command]]
+    label = "Shutdown"
+    cmd = "systemctl poweroff"
+    description = ""
+  '';
+
+  nixTheme = pkgs.writeText "nixos.toml" ''
+    theme = "nixos"
+
+    name = "NixOS"
+    author = "Pombo"
+    version = 1
+
+    [colors]
+    background = "#1E1E2E"
+    text = "#CDD6F4"
+
+    border = "#585B70"
+    header = "#B4BEFE"
+    accent = "${theme.current.accent20}"
+
+    warning = "#F9E2AF"
+    error = "#F38BA8"
+    success = "#A6E3A1"
+
+    selection_fg = "#1E1E2E"
+    selection_bg = "#DDBBFF"
+
+    claws = "#89B4FA"
+    claws_light = "#B4BEFE"
+    claws_shadow = "#585B70"
+
+    shell = "#45475A"
+    shell_light = "#585B70"
+    shell_shadow = "#313244"
+  '';
+
   # ------ Custom Scripts
 
   rama = {
-    desktop = {
-      systemShutdown = addDesktop "shutdown" "systemctl poweroff";
-      systemReboot = addDesktop "reboot" "systemctl reboot";
-      swayExit = addDesktop "sway-exit" "swaymsg exit";
-
-      fastfetch = addDesktop "fastfetch" "alacritty -e ${rama.script.fastfetchLaunch}/bin/fastfetch-launch";
-
-      impala = addDesktopTui "impala";
-      bluetui = addDesktopTui "bluetui";
-      kudu = addDesktopTui "kudu";
-      resterm = addDesktopTui "resterm";
-      wiremix = addDesktopTui "wiremix";
-      btop = addDesktopTui "btop";
-      calcurse = addDesktopTui "calcurse";
-
-      jaiba = addDesktopTui "jaiba";
-      jaiba_slim = addDesktop "jaiba-slim" "alacritty --class floating-terminal -e jaiba --slim";
-      caiman = addDesktopTui "caiman";
-    };
-
     script = {
       # waybarQuote = pkgs.writeShellScriptBin "rama-waybar-quote" ''
       #   quotes=(
@@ -439,16 +531,16 @@ let
 
       coqui = pkgs.rustPlatform.buildRustPackage rec {
         pname = "coqui";
-        version = "2026.1";
+        version = "2026.4";
 
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "coqui";
-          rev = "2026.1";
-          hash = "sha256-oAF2Bq8xnvDvmNimM8L2J/x8o+zTs2sEDbXIEVeu34o=";
+          rev = "2026.4";
+          hash = "sha256-WSc0bhGpH/qJ2YBIewXEZZvWx6HtT54jEl1Y+40fdMw=";
         };
 
-        cargoHash = "sha256-q9Ab4l9FNHWHS4YJMe0x6p5AvFhOdeLO2mjjqKePrxQ=";
+        cargoHash = "sha256-Bhul97WcC/Pbu0QixOG5XytoW5nrqy9efYOX1xox3AI=";
       };
     };
 
@@ -493,6 +585,20 @@ let
         };
 
         cargoHash = "sha256-ie2wA+YenBRPRI90Km/9qEaP/6NvWVZgYBbSWDpC+Lw=";
+      };
+
+      oxker = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "oxker";
+        version = "v0.13.4";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "mrjackwills";
+          repo = "oxker";
+          rev = "v0.13.4";
+          hash = "sha256-5tbH4bLP6xFG+mf7YRjQryV7kwi9CwCzTp0KXkD858E=";
+        };
+
+        cargoHash = "sha256-pJAnR0P5/vA9HbljbC3XhQbpiSeq3oBDCCaMuwfzLZ4=";
       };
     };
 
@@ -714,6 +820,19 @@ let
 
 in
 {
+  # ------ Home Config
+  system.activationScripts.nixTheme = ''
+    install -d -m 0755 /home/iqra/.config/rama/themes
+    install -m 0644 ${nixTheme} /home/iqra/.config/rama/themes/nixos.toml
+    chown iqra\:users /home/iqra/.config/rama/themes/nixos.toml
+  '';
+
+  system.activationScripts.coquiConfig = ''
+    install -d -m 0755 /home/iqra/.config/rama/
+    install -m 0644 ${coquiConfig} /home/iqra/.config/rama/coqui_config.toml
+    chown iqra\:users /home/iqra/.config/rama/coqui_config.toml
+  '';
+
   # ------ Imports
 
   imports = [
@@ -859,8 +978,10 @@ in
 
   };
 
-  # ------ Users :: autologin
-
+  # ------ Security
+  security.sudo.extraConfig = ''
+    Defaults timestamp_timeout=-1
+  '';
   services.getty.autologinUser = "iqra";
 
   # ------ XDG portals
@@ -974,7 +1095,7 @@ in
     bindsym $mod+r reload
 
     # Floating Terminals
-    for_window [app_id="floating-terminal"] floating enable, resize set width 400px height 300px, move position center
+    for_window [app_id="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
 
     # Power
     bindsym $mod+Escape exec swaynag \
