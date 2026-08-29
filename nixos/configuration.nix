@@ -65,22 +65,76 @@ let
       fg = "#cdd6f4";
       muted = "#a6adc8";
       accent10 = "#cba6f7"; # mauve
+      accent20 = "#b4befe"; # lavender
       danger = "#f38ba8"; # red
       warning = "#fab387"; # peach
       success = "#a6e3a1"; # green
     };
+
+    melangeDark = {
+      bg = "#161413";
+      bgDark = "#221C18";
+      bgAlt = "#322B24";
+      fg = "#ECE1D7";
+      muted = "#9C9187";
+      accent10 = "#EBC06E";
+      accent20 = "#D49A3A";
+      danger = "#B65C60";
+      warning = "#E49B5D";
+      success = "#8CBBA1";
+    };
+
+    pomboverso = {
+      bg = "#2E2C42";
+      bgDark = "#2C2336";
+      bgAlt = "#342A44";
+      fg = "#ECE3F6";
+      muted = "#B7AFD1";
+      accent10 = "#B78ED7";
+      accent20 = "#E081D8";
+      danger = "#E081D8";
+      warning = "#EC7CA7";
+      success = "#B7AFD1";
+    };
+
+    tokyoNight = {
+      bg = "#1A1B26";
+      bgDark = "#3A524A";
+      bgAlt = "#567468";
+      fg = "#C0CAF5";
+      muted = "#789488";
+      accent10 = "#7AA2F7";
+      accent20 = "#64A0D2";
+      danger = "#F7768E";
+      warning = "#FF9E64";
+      success = "#9ECE6A";
+    };
+
+    dracula = {
+      bg = "#282A36";
+      bgDark = "#363849";
+      bgAlt = "#424450";
+      fg = "#F8F8F2";
+      muted = "#4F5163";
+      accent10 = "#BD93F8";
+      accent20 = "#8BE9FB";
+      danger = "#FF79C6";
+      warning = "#FFB86C";
+      success = "#50FA7B";
+    };
   };
 
   theme = {
-    current = themes.catppuccinMocha // {
-      # accent20 = "#f5c2e7"; # pink
-      # accent20 = "#89b4fa"; # blue
-      # accent20 = "#f38ba8"; # red
-      # accent20 = "#a6e3a1"; # green
-      # accent20 = "#fab387"; # peach
-      # accent20 = "#89dceb"; # sky
-      accent20 = "#b4befe"; # lavender
-    };
+    current = themes.tokyoNight;
+    # current = themes.catppuccinMocha // {
+    #   # accent20 = "#f5c2e7"; # pink
+    #   # accent20 = "#89b4fa"; # blue
+    #   # accent20 = "#f38ba8"; # red
+    #   # accent20 = "#a6e3a1"; # green
+    #   # accent20 = "#fab387"; # peach
+    #   # accent20 = "#89dceb"; # sky
+    #   accent20 = "#b4befe"; # lavender
+    # };
 
     font = {
       family = "JetBrainsMono Nerd Font";
@@ -245,6 +299,7 @@ let
       keepassxc
       xkeyboard-config
       libxkbcommon
+      rama.appPerl.asciiquarium
     ];
 
     customApps = builtins.attrValues rama.app;
@@ -268,9 +323,40 @@ let
     theme = "nixos"
 
     [[command]]
+    label = "------ Browsers"
+
+    [[command]]
+    label = "Brave"
+    cmd = "brave"
+    description = ""
+
+    [[command]]
+    label = "Firefox"
+    cmd = "firefox"
+    description = ""
+
+    [[command]]
+    label = "LibreWolf"
+    cmd = "librewolf"
+    description = ""
+
+    [[command]]
+    label = "------ Utilities"
+
+    [[command]]
     label = "Jaiba Slim"
     cmd = "alacritty --class floating-terminal -e jaiba --slim"
     description = "TUI Password manager"
+
+    [[command]]
+    label = "Keepass (TMP)"
+    cmd = "keepassxc"
+    description = ""
+
+    [[command]]
+    label = "Nemo"
+    cmd = "nemo"
+    description = ""
 
     [[command]]
     label = "Impala"
@@ -280,6 +366,55 @@ let
     [[command]]
     label = "Bluetui"
     cmd = "alacritty -e bluetui"
+    description = ""
+
+    [[command]]
+    label = "Wiremix"
+    cmd = "alacritty -e wiremix"
+    description = ""
+
+    [[command]]
+    label = "Btop"
+    cmd = "alacritty -e btop"
+    description = ""
+
+
+    [[command]]
+    label = "Caiman"
+    cmd = "alacritty -e caiman"
+    description = ""
+
+    [[command]]
+    label = "Fastfetch"
+    cmd = "alacritty -e fastfetch-launch"
+    description = ""
+
+    [[command]]
+    label = "Calcurse"
+    cmd = "alacritty -e calcurse"
+    description = ""
+
+    [[command]]
+    label = "------ Development"
+
+    [[command]]
+    label = "VSCodium"
+    cmd = "codium"
+    description = ""
+
+    [[command]]
+    label = "Android Studio"
+    cmd = "android-studio"
+    description = ""
+
+    [[command]]
+    label = "Universal Android Debloater"
+    cmd = "uad-ng"
+    description = ""
+
+    [[command]]
+    label = "Github"
+    cmd = "github-desktop"
     description = ""
 
     [[command]]
@@ -298,14 +433,7 @@ let
     description = ""
 
     [[command]]
-    label = "Wiremix"
-    cmd = "alacritty -e wiremix"
-    description = ""
-
-    [[command]]
-    label = "Btop"
-    cmd = "alacritty -e btop"
-    description = ""
+    label = "------ Multimedia"
 
     [[command]]
     label = "Cmus"
@@ -313,32 +441,65 @@ let
     description = ""
 
     [[command]]
-    label = "Caiman"
-    cmd = "alacritty -e caiman"
+    label = "VLC"
+    cmd = "vlc"
     description = ""
 
     [[command]]
-    label = "Fastfetch"
-    cmd = "alacritty -e fastfetch-launch"
+    label = "Video Downloader"
+    cmd = "video-downloader"
     description = ""
 
     [[command]]
-    label = "Universal Android Debloater"
-    cmd = "uad-ng"
+    label = "Inkscape"
+    cmd = "inkscape"
     description = ""
 
     [[command]]
-    label = "Calcurse"
-    cmd = "alacritty -e calcurse"
+    label = "Blender"
+    cmd = "blender"
     description = ""
 
     [[command]]
-    label = "Jaiba"
-    cmd = "alacritty -e jaiba"
-    description = "TUI Password manager"
+    label = "Gimp"
+    cmd = "gimp"
+    description = ""
 
     [[command]]
-    label = "-"
+    label = "Kdenlive"
+    cmd = "kdenlive"
+    description = ""
+
+    [[command]]
+    label = "Darktable"
+    cmd = "darktable"
+    description = ""
+
+    [[command]]
+    label = "------ Games"
+
+    [[command]]
+    label = "Supertux 2"
+    cmd = "supertux2"
+    description = ""
+
+    [[command]]
+    label = "Battle for Wesnoth"
+    cmd = "wesnoth"
+    description = ""
+
+    [[command]]
+    label = "Mindustry"
+    cmd = "mindustry"
+    description = ""
+
+    [[command]]
+    label = "Unreal Torunament 1999"
+    cmd = "ut1999"
+    description = ""
+
+    [[command]]
+    label = "------ System"
 
     [[command]]
     label = "Sway Exit"
@@ -364,19 +525,19 @@ let
     version = 1
 
     [colors]
-    background = "#1E1E2E"
-    text = "#CDD6F4"
+    background = "${theme.current.bg}"
+    text = "${theme.current.fg}"
 
-    border = "#585B70"
-    header = "#B4BEFE"
+    border = "${theme.current.muted}"
+    header = "${theme.current.accent20}"
     accent = "${theme.current.accent20}"
 
-    warning = "#F9E2AF"
-    error = "#F38BA8"
-    success = "#A6E3A1"
+    warning = "${theme.current.warning}"
+    error = "${theme.current.danger}"
+    success = "${theme.current.success}"
 
-    selection_fg = "#1E1E2E"
-    selection_bg = "#DDBBFF"
+    selection_fg = "${theme.current.bg}"
+    selection_bg = "${theme.current.accent10}"
 
     claws = "#89B4FA"
     claws_light = "#B4BEFE"
@@ -678,6 +839,39 @@ let
           pkg-config
         ];
       };
+    };
+
+    appPerl = {
+      asciiquarium =
+        let
+          perlWithDeps = pkgs.perl.withPackages (ps: [
+            ps.TermAnimation
+          ]);
+        in
+        pkgs.stdenv.mkDerivation rec {
+          pname = "asciiquarium";
+          version = "1.6";
+
+          src = pkgs.fetchFromGitHub {
+            owner = "nothub";
+            repo = "asciiquarium";
+            rev = "3862efe961358d18649571e7dab4c18f7c2a74b0";
+            hash = "sha256-kEA2r13Y9lbxGOqeZZXY8LJARMFXrQAS2Uhi14BE8B0=";
+          };
+
+          dontBuild = true;
+
+          nativeBuildInputs = [
+            pkgs.makeWrapper
+          ];
+
+          installPhase = ''
+            install -Dm755 asciiquarium $out/bin/asciiquarium
+
+            wrapProgram $out/bin/asciiquarium \
+              --set PERL5LIB "${perlWithDeps}/lib/perl5/site_perl/5.42.0"
+          '';
+        };
     };
   };
 
