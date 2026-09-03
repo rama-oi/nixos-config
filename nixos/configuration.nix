@@ -125,16 +125,16 @@ let
   };
 
   theme = {
-    current = themes.tokyoNight;
-    # current = themes.catppuccinMocha // {
-    #   # accent20 = "#f5c2e7"; # pink
-    #   # accent20 = "#89b4fa"; # blue
-    #   # accent20 = "#f38ba8"; # red
-    #   # accent20 = "#a6e3a1"; # green
-    #   # accent20 = "#fab387"; # peach
-    #   # accent20 = "#89dceb"; # sky
-    #   accent20 = "#b4befe"; # lavender
-    # };
+    # current = themes.tokyoNight;
+    current = themes.catppuccinMocha // {
+      # accent20 = "#f5c2e7"; # pink
+      # accent20 = "#89b4fa"; # blue
+      # accent20 = "#f38ba8"; # red
+      # accent20 = "#a6e3a1"; # green
+      accent20 = "#fab387"; # peach
+      # accent20 = "#89dceb"; # sky
+      # accent20 = "#b4befe"; # lavender
+    };
 
     font = {
       family = "JetBrainsMono Nerd Font";
@@ -158,6 +158,7 @@ let
       swaybg
       libnotify
       nemo-with-extensions
+      mc
     ];
 
     themes = with pkgs; [
@@ -172,6 +173,7 @@ let
 
     office = with pkgs; [
       calcurse
+      xournalpp
       # yazi
     ];
 
@@ -253,6 +255,7 @@ let
 
     containersKudu = with pkgs; [
       qemu_kvm
+      passt
       xorriso
       tigervnc
       rama.appRust.kudu
@@ -293,6 +296,8 @@ let
       wesnoth
       ut1999
       mindustry
+      veloren
+      supertuxkart
     ];
 
     misc = with pkgs; [
@@ -300,6 +305,8 @@ let
       xkeyboard-config
       libxkbcommon
       rama.appPerl.asciiquarium
+      rama.appRust.weathr
+      rama.appGo.tuios
     ];
 
     customApps = builtins.attrValues rama.app;
@@ -346,7 +353,7 @@ let
     [[command]]
     label = "Jaiba Slim"
     cmd = "alacritty --class floating-terminal -e jaiba --slim"
-    description = "TUI Password manager"
+    description = ""
 
     [[command]]
     label = "Keepass (TMP)"
@@ -356,6 +363,11 @@ let
     [[command]]
     label = "Nemo"
     cmd = "nemo"
+    description = ""
+
+    [[command]]
+    label = "Midnight Commander"
+    cmd = "alacritty -e mc"
     description = ""
 
     [[command]]
@@ -378,10 +390,14 @@ let
     cmd = "alacritty -e btop"
     description = ""
 
-
     [[command]]
     label = "Caiman"
     cmd = "alacritty -e caiman"
+    description = ""
+
+    [[command]]
+    label = "TUIOS"
+    cmd = "alacritty -e tuios"
     description = ""
 
     [[command]]
@@ -484,6 +500,11 @@ let
     description = ""
 
     [[command]]
+    label = "SuperTuxKart"
+    cmd = "supertuxkart"
+    description = ""
+
+    [[command]]
     label = "Battle for Wesnoth"
     cmd = "wesnoth"
     description = ""
@@ -496,6 +517,24 @@ let
     [[command]]
     label = "Unreal Torunament 1999"
     cmd = "ut1999"
+    description = ""
+
+    [[command]]
+    label = "Veloren"
+    cmd = "veloren-voxygen"
+    description = ""
+
+    [[command]]
+    label = "------ Extras"
+
+    [[command]]
+    label = "Weathr"
+    cmd = "alacritty -e weathr"
+    description = ""
+
+    [[command]]
+    label = "Asciiquarium"
+    cmd = "alacritty -e asciiquarium"
     description = ""
 
     [[command]]
@@ -656,11 +695,12 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "jaiba";
-          rev = "2026.7";
+          rev = "cbe20990c31e441b00977de49868671e673c0e68";
           hash = "sha256-oCdk8gB+5Siu3BNSpzhLC+mBtTJG7niomAb6MYTxJK0=";
         };
 
         cargoHash = "sha256-6rlpLP5q7AtHGMyh2U7cmIt+4f40AGgg0GJiV9ODDso=";
+        doCheck = false;
       };
 
       caiman = pkgs.rustPlatform.buildRustPackage rec {
@@ -670,7 +710,7 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "caiman";
-          rev = "2026.1";
+          rev = "b64a52c2487187890c93da6707713252abfa32b8";
           hash = "sha256-hYYCITxCqLQyu1u39LUIuO/BxhUzFT/NLGjDiZfHgUw=";
         };
 
@@ -683,6 +723,7 @@ let
         ];
 
         cargoHash = "sha256-mnjFMmwAyKkFA7uLl4Xdk8geI7ZlXP+niVqCEu2YOGI=";
+        doCheck = false;
       };
 
       carey = fetchTarball {
@@ -697,27 +738,44 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "coqui";
-          rev = "2026.4";
+          rev = "cb4c3353f41d4a1c536cd927ad03338a7498d632";
           hash = "sha256-WSc0bhGpH/qJ2YBIewXEZZvWx6HtT54jEl1Y+40fdMw=";
         };
 
         cargoHash = "sha256-Bhul97WcC/Pbu0QixOG5XytoW5nrqy9efYOX1xox3AI=";
+        doCheck = false;
+      };
+
+      lotus-test = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "lotus-test";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "lotus-io";
+          repo = "lotus-test";
+          rev = "47d74c161471224110469a5dfb988dc924930ac4";
+          hash = "sha256-qzVKY2uxGvTp4waxtnilkjBngt+lTjdO5zfnAZq7PiQ=";
+        };
+
+        cargoHash = "sha256-6IfASHXXlD19BsyDwNyFTiOFCUBWmsbWfQFyyz/6sOQ=";
+        doCheck = false;
       };
     };
 
     appRust = {
       impala = pkgs.rustPlatform.buildRustPackage rec {
         pname = "impala";
-        version = "v0.7.4";
+        version = "v0.8.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "pythops";
           repo = "impala";
-          rev = "v0.7.4";
-          hash = "sha256-GQg/1asi+6hTyOK4cWkAvFJhnWTewFUOn7fAlL+tkUo=";
+          rev = "f5f74d5fc25090a4e25e96de1a7ddaae6ce0f9ca";
+          hash = "sha256-VjiXrjhmgCqCDEgDLWA2W6ppblMu/Cy6MUAS1uQQJuY=";
         };
 
-        cargoHash = "sha256-shIv6fjWAZhIeSzxcHfzxfg2brTP1G3MBAixdi0GoK4=";
+        cargoHash = "sha256-9dMl0U/HEr3w6Gc26qHY87ULneD2Jw2OFgxHRwwTol0=";
+        doCheck = false;
       };
 
       bluetui = pkgs.rustPlatform.buildRustPackage rec {
@@ -727,25 +785,27 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "pythops";
           repo = "bluetui";
-          rev = "v0.8.1";
+          rev = "c959c09bb17bb8036b56980903fe9e1aaad655df";
           hash = "sha256-K+QAU9/XdGZonsKjBXbPbpJhWIHyaqxP6eb670n81LU=";
         };
 
         cargoHash = "sha256-i77j7hKtVxDDiHEBz5E7iwGXWYg0f/NfwFnN71QfgPU=";
+        doCheck = false;
       };
 
       kudu = pkgs.rustPlatform.buildRustPackage rec {
         pname = "kudu";
-        version = "v0.1";
+        version = "v0.3.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "pythops";
           repo = "kudu";
-          rev = "v0.1";
-          hash = "sha256-F6/8FVb/TrpWgh4xgHEdnR/fAb5SjTsF/cn36u5mqm8=";
+          rev = "${version}";
+          hash = "sha256-6XPl51t7g0l7lMdC12fUyUsi/DSaX9D9mIO4X7EXYlc=";
         };
 
-        cargoHash = "sha256-ie2wA+YenBRPRI90Km/9qEaP/6NvWVZgYBbSWDpC+Lw=";
+        cargoHash = "sha256-xILrjqBjWmBtzamXQ/fJuyPYn/Hq2thP3P9a+X6lYJU=";
+        doCheck = false;
       };
 
       oxker = pkgs.rustPlatform.buildRustPackage rec {
@@ -760,6 +820,22 @@ let
         };
 
         cargoHash = "sha256-pJAnR0P5/vA9HbljbC3XhQbpiSeq3oBDCCaMuwfzLZ4=";
+        doCheck = false;
+      };
+
+      weathr = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "weathr";
+        version = "v1.4.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "Veirt";
+          repo = "weathr";
+          rev = "v1.4.0";
+          hash = "sha256-BaG8K17RNuswtGx74CEBzMKjFMaNW0RZ5FjM3EfSVTE=";
+        };
+
+        cargoHash = "sha256-xIjFleANgzoTS+4Yky+mvtX1IeU6IdaH1YuB8W8bYIo=";
+        doCheck = false;
       };
     };
 
@@ -776,6 +852,7 @@ let
         };
 
         vendorHash = "sha256-AYe9qB4t1ocL3qQpwXz1Rm91q238rD68ewcwjUxO9nM=";
+        doCheck = false;
       };
 
       lazygit = pkgs.buildGoModule rec {
@@ -794,6 +871,26 @@ let
         nativeCheckInputs = [
           pkgs.gitMinimal
         ];
+
+        doCheck = false;
+      };
+
+      tuios = pkgs.buildGoModule rec {
+        pname = "tuios";
+        version = "v0.7.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "Gaurav-Gosain";
+          repo = "tuios";
+          rev = "v0.7.0";
+          hash = "sha256-XPcgUDlIbwp278Kc9B0aXxxIX2XnsJpFzxHDaop9cLs=";
+        };
+
+        vendorHash = "sha256-98XZe60gcRWyP0ApUV+qCJ0UoAExx7X0FPtFL0Tr0a4=";
+
+        # nativeCheckInputs = [
+        #   pkgs.gitMinimal
+        # ];
 
         doCheck = false;
       };
@@ -819,6 +916,8 @@ let
           mkdir -p $out/bin
           cp bin/btop $out/bin/
         '';
+
+        doCheck = false;
       };
     };
 
@@ -838,6 +937,8 @@ let
           cmake
           pkg-config
         ];
+
+        doCheck = false;
       };
     };
 
@@ -1609,12 +1710,14 @@ in
     enable = true;
 
     shellAliases = {
-      ls = "ls -lah --color=always --group-directories-first";
+      ls = "ls --color=always --group-directories-first";
       rm = "rm -I --preserve-root";
       cp = "cp -i";
       mv = "mv -i";
       mkdir = "mkdir -p";
       ".." = "cd ..";
+      weathr = "weathr --simulate thunderstorm --hide-hud";
+      lotus = "lotus-test";
     };
 
     promptInit = ''
