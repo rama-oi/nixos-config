@@ -128,10 +128,10 @@ let
     # current = themes.tokyoNight;
     current = themes.catppuccinMocha // {
       # accent20 = "#f5c2e7"; # pink
-      # accent20 = "#89b4fa"; # blue
+      accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
-      accent20 = "#fab387"; # peach
+      # accent20 = "#fab387"; # peach
       # accent20 = "#89dceb"; # sky
       # accent20 = "#b4befe"; # lavender
     };
@@ -169,6 +169,7 @@ let
     system = with pkgs; [
       rama.appC.fastfetch
       rama.appCpp.btop
+      rama.appC.tmux
     ];
 
     office = with pkgs; [
@@ -218,6 +219,23 @@ let
       rama.appGo.lazygit
     ];
 
+    developmentPascal = with pkgs; [
+      fpc
+    ];
+
+    developmentRuby = with pkgs; [
+      ruby
+      rubyPackages.standard
+    ];
+
+    developmentLua = with pkgs; [
+      lua
+    ];
+
+    developmentNim = with pkgs; [
+      nim
+    ];
+
     developmentSql = with pkgs; [
       postgresql
     ];
@@ -231,9 +249,9 @@ let
       file
     ];
 
-    # developmentGo = with pkgs; [
-    #   go
-    # ];
+    developmentGo = with pkgs; [
+      go
+    ];
 
     developmentAndroid = with pkgs; [
       android-studio
@@ -298,6 +316,7 @@ let
       mindustry
       veloren
       supertuxkart
+      openra
     ];
 
     misc = with pkgs; [
@@ -306,7 +325,6 @@ let
       libxkbcommon
       rama.appPerl.asciiquarium
       rama.appRust.weathr
-      rama.appGo.tuios
     ];
 
     customApps = builtins.attrValues rama.app;
@@ -393,11 +411,6 @@ let
     [[command]]
     label = "Caiman"
     cmd = "alacritty -e caiman"
-    description = ""
-
-    [[command]]
-    label = "TUIOS"
-    cmd = "alacritty -e tuios"
     description = ""
 
     [[command]]
@@ -535,6 +548,16 @@ let
     [[command]]
     label = "Asciiquarium"
     cmd = "alacritty -e asciiquarium"
+    description = ""
+
+    [[command]]
+    label = "Matrix"
+    cmd = "alacritty -e matrix"
+    description = ""
+
+    [[command]]
+    label = "Polygon"
+    cmd = "alacritty -e polygon"
     description = ""
 
     [[command]]
@@ -760,6 +783,71 @@ let
         cargoHash = "sha256-6IfASHXXlD19BsyDwNyFTiOFCUBWmsbWfQFyyz/6sOQ=";
         doCheck = false;
       };
+
+      matrix = pkgs.stdenv.mkDerivation rec {
+        pname = "matrix";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "matrix";
+          rev = "master";
+          hash = "sha256-qBzyQrxQepN/lLtvuM7JFNTZma/vzQ/oNkB9EEWGqzA=";
+        };
+
+        dontBuild = true;
+
+        installPhase = ''
+          mkdir -p $out/bin
+          cp matrix $out/bin/matrix
+          chmod +x $out/bin/matrix
+        '';
+      };
+
+      lupa = pkgs.stdenv.mkDerivation rec {
+        pname = "lupa";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "lupa";
+          rev = "master";
+          hash = "sha256-AQxD4sd1htk76LwUESAfKeD+X1+QNk6omuzVB9aZDs8=";
+        };
+
+        dontBuild = true;
+
+        installPhase = ''
+          mkdir -p $out/bin
+          cp lupa $out/bin/lupa
+          chmod +x $out/bin/lupa
+        '';
+      };
+
+      polygon = pkgs.stdenv.mkDerivation {
+        pname = "polygon";
+        version = "2026.1";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "polygon";
+          rev = "master";
+          hash = "sha256-gehgbbMdePQlljMiAuH2v1JaKQv02KbRMhLPtB4RgvU=";
+        };
+
+        dontBuild = true;
+
+        installPhase = ''
+          mkdir -p $out/bin
+          cp polygon.rb $out/bin/polygon
+          chmod +x $out/bin/polygon
+        '';
+
+        postFixup = ''
+          sed -i '1s|^#!.*|#!${pkgs.ruby}/bin/ruby|' $out/bin/polygon
+        '';
+      };
+
     };
 
     appRust = {
@@ -874,26 +962,6 @@ let
 
         doCheck = false;
       };
-
-      tuios = pkgs.buildGoModule rec {
-        pname = "tuios";
-        version = "v0.7.0";
-
-        src = pkgs.fetchFromGitHub {
-          owner = "Gaurav-Gosain";
-          repo = "tuios";
-          rev = "v0.7.0";
-          hash = "sha256-XPcgUDlIbwp278Kc9B0aXxxIX2XnsJpFzxHDaop9cLs=";
-        };
-
-        vendorHash = "sha256-98XZe60gcRWyP0ApUV+qCJ0UoAExx7X0FPtFL0Tr0a4=";
-
-        # nativeCheckInputs = [
-        #   pkgs.gitMinimal
-        # ];
-
-        doCheck = false;
-      };
     };
 
     appCpp = {
@@ -940,6 +1008,29 @@ let
 
         doCheck = false;
       };
+
+      tmux = pkgs.stdenv.mkDerivation rec {
+        pname = "tmux";
+        version = "master";
+        src = pkgs.fetchFromGitHub {
+          owner = "tmux";
+          repo = "tmux";
+          rev = "master";
+          hash = "sha256-b7Zo3PGMU1Tlbj1yrSSx2gUGTdETCmPj3GkeOa/i9pQ=";
+        };
+        nativeBuildInputs = with pkgs; [
+          autoconf
+          automake
+          pkg-config
+        ];
+        buildInputs = with pkgs; [
+          libevent
+          ncurses
+          bison
+        ];
+        preConfigure = "sh autogen.sh ";
+        doCheck = false;
+      };
     };
 
     appPerl = {
@@ -980,29 +1071,22 @@ let
 
   androidComposition = pkgs.androidenv.composeAndroidPackages {
     platformVersions = [
+      "10"
+      "16"
       "21"
-      "23"
-      "28"
-      "29"
-      "30"
-      "31"
-      "33"
-      "34"
-      "35"
       "36"
       "37"
     ];
 
     abiVersions = [
       "x86_64"
+      "x86"
     ];
 
     includeEmulator = true;
     includeSystemImages = true;
 
-    systemImageTypes = [
-      "google_apis"
-    ];
+    systemImageTypes = [ "default" ];
 
     includeNDK = true;
     includeSources = false;
@@ -1315,6 +1399,8 @@ in
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";
     XDG_CURRENT_DESKTOP = "sway";
+
+    ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
   };
 
   # ------ Virtualization
