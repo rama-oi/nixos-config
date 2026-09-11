@@ -472,11 +472,6 @@ let
     description = ""
 
     [[command]]
-    label = "Virtual"
-    cmd = "xfreerdp /v:YOUR_SERVER /u:YOUR_USERNAME"
-    description = ""
-
-    [[command]]
     label = "------ Multimedia"
 
     [[command]]
