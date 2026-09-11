@@ -1,10 +1,7 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 
 let
+
   # ------ Parsers :: CSS
 
   parser = {
@@ -64,24 +61,17 @@ let
       bgAlt = "#313244";
       fg = "#cdd6f4";
       muted = "#a6adc8";
-      accent10 = "#cba6f7"; # mauve
-      accent20 = "#b4befe"; # lavender
-      danger = "#f38ba8"; # red
-      warning = "#fab387"; # peach
-      success = "#a6e3a1"; # green
+      accent10 = "#cba6f7";
+      accent20 = "#b4befe";
+      danger = "#f38ba8";
+      warning = "#fab387";
+      success = "#a6e3a1";
     };
   };
 
   theme = {
-    # current = themes.tokyoNight;
     current = themes.catppuccinMocha // {
-      # accent20 = "#f5c2e7"; # pink
-      accent20 = "#89b4fa"; # blue
-      # accent20 = "#f38ba8"; # red
-      # accent20 = "#a6e3a1"; # green
-      # accent20 = "#fab387"; # peach
-      # accent20 = "#89dceb"; # sky
-      # accent20 = "#b4befe"; # lavender
+      accent20 = "#89b4fa";
     };
 
     font = {
@@ -99,12 +89,14 @@ let
   # ------ Vars :: Packages
 
   packages = {
+
     desktop = with pkgs; [
-      waybar
-      mako
-      swaybg
+      i3
+      i3status
+      dmenu
+      dunst
       libnotify
-      nemo-with-extensions
+      nemo
       mc
     ];
 
@@ -116,7 +108,6 @@ let
     system = with pkgs; [
       alacritty
       st
-      
       rama.appC.fastfetch
       rama.appCpp.btop
       rama.appC.tmux
@@ -124,11 +115,8 @@ let
 
     commandUtils = with pkgs; [
       udiskie
-      wl-clipboard
-      grim
-      slurp
-      wf-recorder
-
+      xclip
+      scrot
       tree
       jq
       wget
@@ -146,7 +134,6 @@ let
     networking = with pkgs; [
       bluez
       wiremix
-
       rama.appGo.resterm
       rama.appRust.impala
       rama.appRust.bluetui
@@ -179,7 +166,6 @@ let
     ];
 
     creative = with pkgs; [
-      inkscape
       imagemagick
       imv
       cmus
@@ -201,7 +187,7 @@ let
     scripts = builtins.attrValues rama.script;
   };
 
-  # ------ Vars :: Sway
+  # ------ Vars :: i3
 
   workspaces = builtins.genList (n: toString (n + 1)) 9;
 
@@ -351,8 +337,8 @@ let
     label = "------ System"
 
     [[command]]
-    label = "Sway Exit"
-    cmd = "swaymsg exit"
+    label = "i3 Exit"
+    cmd = "i3-msg exit"
     description = ""
 
     [[command]]
@@ -369,7 +355,9 @@ let
   # ------ Custom Scripts
 
   rama = {
+
     script = {
+
       batteryMonitor = pkgs.writeShellScriptBin "rama-battery-monitor" ''
         BATTERY="/sys/class/power_supply/BAT0"
         THRESHOLD=10
@@ -391,8 +379,6 @@ let
                 touch "$STATE_FILE"
               fi
             else
-              # Reset the notification once the battery is charged
-              # or goes above the threshold.
               rm -f "$STATE_FILE"
             fi
           fi
@@ -407,15 +393,39 @@ let
       '';
 
       coquiLaunch = pkgs.writeShellScriptBin "rama-coqui-launch" ''
-        if swaymsg '[class="^floating-terminal$"] focus' >/dev/null 2>&1; then
+        if i3-msg '[class="^floating-terminal$"] focus' >/dev/null 2>&1; then
           exit 0
         fi
 
         exec st -c floating-terminal -e coqui
       '';
+
+      powerMenu = pkgs.writeShellScriptBin "rama-power-menu" ''
+        choice=$(
+          printf '%s\n' \
+            "Shutdown" \
+            "Reboot" \
+            "Logout" |
+          dmenu -i -p "Power:"
+        )
+
+        case "$choice" in
+          Shutdown)
+            systemctl poweroff
+            ;;
+          Reboot)
+            systemctl reboot
+            ;;
+          Logout)
+            i3-msg exit
+            ;;
+        esac
+      '';
+
     };
 
     app = {
+
       jaiba = pkgs.rustPlatform.buildRustPackage rec {
         pname = "jaiba";
         version = "2026.7";
@@ -428,6 +438,7 @@ let
         };
 
         cargoHash = "sha256-6rlpLP5q7AtHGMyh2U7cmIt+4f40AGgg0GJiV9ODDso=";
+
         doCheck = false;
       };
 
@@ -450,7 +461,8 @@ let
           libxkbcommon
         ];
 
-        cargoHash = "sha256-mnjFMmwAyKkFA7uLl4Xdk8geI7ZlXP+niVqCEu2YOGI=";
+        cargoHash = "sha256-mnjFMmwAyKFAu7Ll4Xdk8geI7ZlXP+niVqCEu2YOGI=";
+
         doCheck = false;
       };
 
@@ -471,6 +483,7 @@ let
         };
 
         cargoHash = "sha256-Bhul97WcC/Pbu0QixOG5XytoW5nrqy9efYOX1xox3AI=";
+
         doCheck = false;
       };
 
@@ -521,6 +534,7 @@ let
     };
 
     appRust = {
+
       impala = pkgs.rustPlatform.buildRustPackage rec {
         pname = "impala";
         version = "v0.8.0";
@@ -533,6 +547,7 @@ let
         };
 
         cargoHash = "sha256-9dMl0U/HEr3w6Gc26qHY87ULneD2Jw2OFgxHRwwTol0=";
+
         doCheck = false;
       };
 
@@ -548,6 +563,7 @@ let
         };
 
         cargoHash = "sha256-i77j7hKtVxDDiHEBz5E7iwGXWYg0f/NfwFnN71QfgPU=";
+
         doCheck = false;
       };
 
@@ -563,11 +579,14 @@ let
         };
 
         cargoHash = "sha256-xIjFleANgzoTS+4Yky+mvtX1IeU6IdaH1YuB8W8bYIo=";
+
         doCheck = false;
       };
+
     };
 
     appGo = {
+
       resterm = pkgs.buildGoModule rec {
         pname = "resterm";
         version = "v1.2.4";
@@ -580,11 +599,14 @@ let
         };
 
         vendorHash = "sha256-AYe9qB4t1ocL3qQpwXz1Rm91q238rD68ewcwjUxO9nM=";
+
         doCheck = false;
       };
+
     };
 
     appCpp = {
+
       btop = pkgs.stdenv.mkDerivation rec {
         pname = "btop";
         version = "1.4.7";
@@ -607,9 +629,11 @@ let
 
         doCheck = false;
       };
+
     };
 
     appC = {
+
       fastfetch = pkgs.stdenv.mkDerivation rec {
         pname = "fastfetch";
         version = "2.67.1";
@@ -632,28 +656,35 @@ let
       tmux = pkgs.stdenv.mkDerivation rec {
         pname = "tmux";
         version = "master";
+
         src = pkgs.fetchFromGitHub {
           owner = "tmux";
           repo = "tmux";
           rev = "master";
           hash = "sha256-b7Zo3PGMU1Tlbj1yrSSx2gUGTdETCmPj3GkeOa/i9pQ=";
         };
+
         nativeBuildInputs = with pkgs; [
           autoconf
           automake
           pkg-config
         ];
+
         buildInputs = with pkgs; [
           libevent
           ncurses
           bison
         ];
+
         preConfigure = "sh autogen.sh ";
+
         doCheck = false;
       };
+
     };
 
     appPerl = {
+
       asciiquarium =
         let
           perlWithDeps = pkgs.perl.withPackages (ps: [
@@ -684,7 +715,9 @@ let
               --set PERL5LIB "${perlWithDeps}/lib/perl5/site_perl/5.42.0"
           '';
         };
+
     };
+
   };
 
   # ------ Android SDK
@@ -705,9 +738,7 @@ let
 
     includeEmulator = true;
     includeSystemImages = true;
-
     systemImageTypes = [ "default" ];
-
     includeNDK = true;
     includeSources = false;
   };
@@ -715,6 +746,7 @@ let
   androidSdk = androidComposition.androidsdk;
 
   # ------ GRUB :: Catppuccin Mocha Theme
+
   grubTheme = pkgs.runCommand "rama-grub-theme" { } ''
     mkdir -p $out
 
@@ -734,6 +766,7 @@ let
     terminal-border: "0"
 
     # NixOS title
+
     + label {
       left = 50%-300
       top = 12%
@@ -741,13 +774,16 @@ let
       height = 40
 
       text = "NIXOS"
+
       align = "center"
 
       font = "Unifont Regular 24"
+
       color = "${theme.current.accent10}"
     }
 
     # Subtitle
+
     + label {
       left = 50%-300
       top = 18%
@@ -755,13 +791,16 @@ let
       height = 30
 
       text = "system generations"
+
       align = "center"
 
       font = "Unifont Regular 16"
+
       color = "${theme.current.muted}"
     }
 
     # Generation menu
+
     + boot_menu {
       left = 50%-300
       top = 30%
@@ -786,6 +825,7 @@ let
     }
 
     # Countdown
+
     + label {
       left = 50%-300
       top = 82%
@@ -795,13 +835,16 @@ let
       align = "center"
 
       id = "__timeout__"
+
       text = "Booting in %d seconds"
 
       font = "Unifont Regular 16"
+
       color = "${theme.current.muted}"
     }
 
     # Countdown progress bar
+
     + progress_bar {
       left = 50%-300
       top = 88%
@@ -814,16 +857,24 @@ let
       bg_color = "${theme.current.bgAlt}"
       border_color = "${theme.current.bg}"
     }
+
     EOF
   '';
 
 in
 {
+
   # ------ Home Config
+
   system.activationScripts.coquiConfig = ''
     install -d -m 0755 /home/${username}/.config/rama/
-    install -m 0644 ${coquiConfig} /home/${username}/.config/rama/coqui_config.toml
-    chown ${username}\:users /home/${username}/.config/rama/coqui_config.toml
+
+    install -m 0644 \
+      ${coquiConfig} \
+      /home/${username}/.config/rama/coqui_config.toml
+
+    chown ${username}:users \
+      /home/${username}/.config/rama/coqui_config.toml
   '';
 
   # ------ Imports
@@ -838,6 +889,7 @@ in
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
+
     extraLocaleSettings = {
       LC_ADDRESS = "en_US.UTF-8";
       LC_IDENTIFICATION = "en_US.UTF-8";
@@ -866,30 +918,26 @@ in
   };
 
   # ------ Boot :: GRUB
+
   boot = {
     loader = {
       systemd-boot.enable = false;
-
       efi.canTouchEfiVariables = true;
 
       grub = {
         enable = true;
-
         efiSupport = true;
         device = "nodev";
 
-        gfxmodeEfi = "1920x1080";
+        gfxmodeEfi = "1024x600";
         gfxpayloadEfi = "keep";
 
         timeoutStyle = "menu";
-
         configurationLimit = 10;
+
         theme = grubTheme;
       };
     };
-
-    initrd.luks.devices."luks-26f0579d-79fe-4ff9-96fa-f432718e7385".device =
-      "/dev/disk/by-uuid/26f0579d-79fe-4ff9-96fa-f432718e7385";
   };
 
   # ------ Hardware :: Audio
@@ -900,7 +948,9 @@ in
 
   networking = {
     hostName = username;
+
     networkmanager.enable = false;
+
     wireless.iwd.enable = true;
   };
 
@@ -910,6 +960,7 @@ in
 
   users.users.${username} = {
     isNormalUser = true;
+
     description = username;
 
     extraGroups = [
@@ -919,17 +970,24 @@ in
   };
 
   # ------ Security
+
   security.sudo.extraConfig = ''
     Defaults timestamp_timeout=-1
   '';
 
   # ------ Services
+
   services = {
+
     xserver = {
-      enable = false;
+      enable = true;
+
+      # X11 keyboard layout
+      xkb.layout = "carey";
 
       xkb.extraLayouts.carey = {
         description = "carey";
+
         languages = [
           "spa"
           "fra"
@@ -949,8 +1007,30 @@ in
           "mwl"
           "rup"
         ];
+
         symbolsFile = "${rama.app.carey}/xkb/symbols/carey";
       };
+
+      # X11 input handling
+      libinput = {
+        enable = true;
+
+        touchpad = {
+          tapping = true;
+        };
+      };
+
+      # i3
+      windowManager.i3 = {
+        enable = true;
+        package = pkgs.i3;
+      };
+
+      # Lightweight login manager
+      displayManager.lightdm.enable = true;
+
+      displayManager.autoLogin.enable = true;
+      displayManager.autoLogin.user = username;
     };
 
     pulseaudio.enable = false;
@@ -958,7 +1038,6 @@ in
     pipewire = {
       enable = true;
       alsa.enable = true;
-      alsa.support32Bit = true;
       pulse.enable = true;
     };
 
@@ -972,7 +1051,10 @@ in
 
   xdg.portal = {
     enable = true;
-    wlr.enable = true;
+
+    # No wlroots/Sway portal.
+    wlr.enable = false;
+
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
     ];
@@ -987,332 +1069,221 @@ in
   # ------ Environment variables
 
   environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-    MOZ_ENABLE_WAYLAND = "1";
-    XDG_CURRENT_DESKTOP = "sway";
+    XDG_CURRENT_DESKTOP = "i3";
+    XDG_SESSION_DESKTOP = "i3";
 
     ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
   };
 
-  # ------ Program :: Sway
+  # ------ Program :: i3
 
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-    extraPackages = with pkgs; [ ];
-  };
-
-  environment.etc."sway/config".text = ''
+  environment.etc."i3/config".text = ''
     set $mod Mod4
 
-    include /etc/sway/config.d/*
-
     # Startup
-    exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
-    exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
 
-    exec udiskie
-    exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
-    exec rama-battery-monitor
-    exec bluetoothctl power off
-    exec swaybg -c '${theme.current.accent20}'
+    exec --no-startup-id dbus-update-activation-environment --systemd DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP=i3
+
+    exec --no-startup-id systemctl --user import-environment DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP
+
+    exec --no-startup-id udiskie
+
+    exec --no-startup-id dunst
+
+    exec --no-startup-id rama-battery-monitor
+
+    exec --no-startup-id bluetoothctl power off
 
     # GTK theme
-    exec gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'
+    exec --no-startup-id gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'
 
     # Window decorations
+
     default_border pixel 1
     default_floating_border pixel 1
 
     # Window colors
+
     client.focused ${theme.current.accent10} ${theme.current.bgAlt} ${theme.current.fg} ${theme.current.accent10} ${theme.current.bgAlt}
+
     client.unfocused ${theme.current.bg} ${theme.current.bg} ${theme.current.muted} ${theme.current.bgAlt} ${theme.current.bg}
 
-    # Display
-    output eDP-1 scale 2
-
-    # Cursor
-    seat seat0 xcursor_theme Adwaita 18
-
-    # Keyboard
-    input type:keyboard {
-        xkb_layout carey
-    }
-
-    # Touchpad
-    input type:touchpad {
-        tap enabled
-    }
-
     # Gaps
+
     gaps inner ${theme.spacing.md}
     gaps outer ${theme.spacing.sm}
 
     # Terminal
-    bindsym $mod+z exec st
+
+    bindsym $mod+z exec --no-startup-id st
 
     # Application launcher
-    bindsym $mod+space exec rama-coqui-launch
+
+    bindsym $mod+space exec --no-startup-id rama-coqui-launch
 
     # Close window
+
     bindsym $mod+x kill
 
-    # Reload Sway
+    # Reload i3
+
     bindsym $mod+r reload
 
-    # Floating Terminals
-    for_window [class="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
+    # Floating terminals
+
+    for_window [class="floating-terminal"] \
+      floating enable, \
+      resize set 350 400, \
+      move position center
 
     # Power
-    bindsym $mod+Escape exec swaynag \
-      -t custom \
-      -m 'Are you sure you want to shut down the computer?' \
-      -Z 'Yes' 'systemctl poweroff' \
-      -s 'No'
+
+    bindsym $mod+Escape exec --no-startup-id rama-power-menu
+
+    # Workspaces
 
     ${workspaceBindings}
 
     # Resizing
-    bindsym $mod+comma resize shrink width 1 ppt
-    bindsym $mod+period resize grow width 1 ppt
+
+    bindsym $mod+comma resize shrink width 1 px
+    bindsym $mod+period resize grow width 1 px
 
     # Volume
-    bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-    bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
-    bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
+
+    bindsym XF86AudioMute exec --no-startup-id \
+      wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+    bindsym XF86AudioLowerVolume exec --no-startup-id \
+      wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
+
+    bindsym XF86AudioRaiseVolume exec --no-startup-id \
+      wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
 
     # Microphone
-    bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+
+    bindsym XF86AudioMicMute exec --no-startup-id \
+      wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
     # Brightness
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 1%-
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 1%+
 
-    # Touchpad toggle
-    bindsym --locked XF86TouchpadToggle exec rama-toggle-signals
+    bindsym XF86MonBrightnessDown exec --no-startup-id \
+      brightnessctl set 1%-
+
+    bindsym XF86MonBrightnessUp exec --no-startup-id \
+      brightnessctl set 1%+
 
     # Screenshot
-    bindsym Print exec grim -g "$(slurp)" - | wl-copy
+
+    bindsym Print exec --no-startup-id \
+      sh -c 'scrot - | xclip -selection clipboard -t image/png'
+
+    # i3status bar
+
+    bar {
+      status_command i3status -c /etc/i3status.conf
+
+      position top
+
+      colors {
+        background ${theme.current.bg}
+        statusline ${theme.current.fg}
+        separator ${theme.current.muted}
+
+        focused_workspace ${theme.current.accent20} ${theme.current.accent20} ${theme.current.bg}
+        active_workspace ${theme.current.bgAlt} ${theme.current.bgAlt} ${theme.current.fg}
+        inactive_workspace ${theme.current.bg} ${theme.current.bg} ${theme.current.muted}
+        urgent_workspace ${theme.current.danger} ${theme.current.danger} ${theme.current.bg}
+      }
+    }
   '';
 
-  environment.etc."swaynag/config".text = ''
-    [custom]
-    background=${theme.current.bgAlt}
-    text=${theme.current.fg}
-    button-background=${theme.current.accent10}
-    button-text=${theme.current.bg}
-    border=${theme.current.bgAlt}
-    button-border-size=4
-    button-padding=4
-    button-gap=0
-    button-dismiss-gap=4
+  # ------ Program :: i3status
+
+  environment.etc."i3status.conf".text = ''
+    general {
+      colors = true
+      interval = 5
+
+      color_good = "${theme.current.success}"
+      color_bad = "${theme.current.danger}"
+      color_degraded = "${theme.current.warning}"
+    }
+
+    order += "wireless _first_"
+    order += "battery all"
+    order += "volume master"
+    order += "cpu_temperature 0"
+    order += "disk /"
+    order += "tztime local"
+
+    wireless _first_ {
+      format_up = "wifi:%quality %essid"
+      format_down = "wifi:down"
+    }
+
+    battery all {
+      format = "bat:%status %percentage"
+      format_down = "bat:down"
+      last_full_capacity = true
+    }
+
+    volume master {
+      format = "snd:%volume"
+      format_muted = "snd:muted"
+    }
+
+    cpu_temperature 0 {
+      format = "temp:%degrees°C"
+    }
+
+    disk "/" {
+      format = "disk:%avail"
+    }
+
+    tztime local {
+      format = "%m/%d | %H:%M"
+    }
   '';
 
-  # ------ Program :: Waybar
+  # ------ Program :: Dunst
 
-  environment.etc."waybar/config".text = builtins.toJSON {
-    layer = "top";
-    position = "top";
-    height = 26;
-    spacing = theme.spacing.md;
+  environment.etc."dunst/dunstrc".text = ''
+    [global]
+      monitor = 0
+      follow = mouse
 
-    "modules-left" = [
-      "sway/workspaces"
-      "wlr/taskbar"
-    ];
+      width = 300
+      height = 100
 
-    "modules-center" = [ ];
+      origin = top-right
+      offset = 10x10
 
-    "modules-right" = [
-      "network"
-      "custom/bluetooth"
-      "sway/language"
-      "backlight"
-      "pulseaudio"
-      "battery"
-      "temperature"
-      "clock"
-      "custom/msg"
-    ];
+      padding = 8
+      horizontal_padding = 8
 
-    "sway/workspaces" = {
-      "disable-scroll" = true;
-      "all-outputs" = true;
-      format = "{name}";
-    };
+      frame_width = 2
+      frame_color = "${theme.current.accent10}"
 
-    "wlr/taskbar" = {
-      format = "{icon}";
-      tooltip = false;
-      "icon-size" = 16;
-      "tooltip-format" = "{title}";
-      "on-click" = "activate";
-      "on-click-middle" = "close";
-      "all-outputs" = true;
-      "sort-by" = "name";
-    };
+      background = "${theme.current.bg}"
+      foreground = "${theme.current.fg}"
 
-    network = {
-      interval = 5;
-      "format-wifi" = "wf:{essid}:{signalStrength}%";
-      "format-ethernet" = "eth:{ifname}";
-      "format-disconnected" = "wf:0";
-      "on-click" = "st -e impala";
-      tooltip = false;
-    };
+      font = "${theme.font.family} ${theme.font.size}"
 
-    "sway/language" = {
-      format = "kbd:{short}";
-      tooltip = false;
-      "on-click" = "st -e caiman";
-    };
+      timeout = 5
 
-    backlight = {
-      interval = 2;
-      format = "bri:{percent}%";
-      tooltip = false;
-    };
+    [urgency_low]
+      background = "${theme.current.bg}"
+      foreground = "${theme.current.muted}"
 
-    pulseaudio = {
-      format = "snd:{volume}%";
-      "format-muted" = "snd:{volume}%";
-      tooltip = false;
-      "on-click" = "st -e wiremix";
-    };
+    [urgency_normal]
+      background = "${theme.current.bg}"
+      foreground = "${theme.current.fg}"
 
-    battery = {
-      interval = 10;
-      format = "bat:{capacity}%";
-      "format-charging" = "bat:{capacity}%";
-      "format-full" = "bat:{capacity}%";
-      tooltip = false;
-      "on-click" = "st -e btop";
-
-      states = {
-        warning = 20;
-        critical = 10;
-      };
-    };
-
-    temperature = {
-      interval = 5;
-      format = "{temperatureF}°F";
-      "critical-threshold" = 80;
-      tooltip = false;
-      "on-click" = "st -e btop";
-    };
-
-    clock = {
-      interval = 1;
-      format = "{:%m/%d | %H:%M}";
-      tooltip = false;
-      "on-click" = "st -e calcurse";
-    };
-  };
-
-  environment.etc."waybar/style.css".text = parser.css {
-    "*" = {
-      "font-family" = "\"${theme.font.family}\"";
-      "font-size" = "${theme.font.size}px";
-    };
-
-    "window#waybar" = {
-      "background" = theme.current.bg;
-      "color" = theme.current.fg;
-    };
-
-    "button, button:hover" = {
-      "padding" = "0";
-      "margin" = "0";
-      "background" = "transparent";
-      "border" = "0";
-      "box-shadow" = "none";
-      "text-shadow" = "unset";
-      "outline" = "unset";
-    };
-
-    "#taskbar" = {
-      "background-color" = theme.current.bgAlt;
-      "border-radius" = "25px";
-      "padding" = "0px ${theme.spacing.md}px";
-      "margin" = "0 ${theme.spacing.sm}px";
-    };
-
-    "button label, #taskbar button, label" = {
-      "color" = theme.current.muted;
-      "border" = "none";
-      "padding" = "0px ${theme.spacing.md}px";
-      "margin" = "${theme.spacing.sm}px";
-      "border-radius" = "25px";
-      "font-weight" = "bold";
-      "min-width" = "${theme.spacing.lg}px";
-      "min-height" = "22px";
-      "transition" = "0";
-    };
-
-    "button:hover label, #taskbar button:hover" = {
-      "color" = theme.current.bg;
-      "background" = theme.current.accent10;
-    };
-
-    "button.focused label" = {
-      "color" = theme.current.bg;
-      "background" = theme.current.accent20;
-    };
-
-    "#taskbar button.active" = {
-      "background" = theme.current.accent20;
-    };
-
-    "button.urgent label" = {
-      "color" = theme.current.bg;
-      "background-color" = theme.current.warning;
-    };
-
-    "#custom-msg" = {
-      color = theme.current.accent10;
-      font-weight = "bold";
-    };
-
-    "#language" = {
-      "min-width" = "70px";
-    };
-
-    "#pulseaudio.muted, #battery.critical" =
-      {
-        "color" = theme.current.bg;
-        "background-color" = theme.current.danger;
-      };
-
-    "#battery.warning" = {
-      "color" = theme.current.bg;
-      "background-color" = theme.current.warning;
-    };
-
-    "#battery.charging, #temperature" = {
-      "color" = theme.current.bg;
-      "background-color" = theme.current.success;
-    };
-
-    "#network:hover, #language:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
-      {
-        "color" = theme.current.bg;
-        "background-color" = theme.current.accent20;
-      };
-  };
-
-  # ------ Program :: Mako
-
-  environment.etc."mako/config".text = ''
-    [mode=default]
-    background-color=${theme.current.bg}
-    text-color=${theme.current.fg}
-    border-color=${theme.current.accent10}
-
-    [urgency=critical]
-    background-color=${theme.current.danger}
-    text-color=${theme.current.bg}
-    border-color=${theme.current.danger}
+    [urgency_critical]
+      background = "${theme.current.danger}"
+      foreground = "${theme.current.bg}"
+      frame_color = "${theme.current.danger}"
   '';
 
   # ------ Program :: Alacritty
@@ -1329,7 +1300,9 @@ in
 
   # ------ Packages
 
-  environment.systemPackages = builtins.concatLists (builtins.attrValues packages);
+  environment.systemPackages = builtins.concatLists (builtins.attrValues packages) ++ [
+    rama.script.powerMenu
+  ];
 
   # ------ Fonts
 
@@ -1356,13 +1329,6 @@ in
     promptInit = ''
       ${bashColorInit}
 
-      record() {
-        clear
-        
-        timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
-        wf-recorder -o eDP-1 -f "$HOME/Videos/screen-$timestamp.mp4"
-      }
-
       update() {
         clear
 
@@ -1379,12 +1345,12 @@ in
 
         printf '%b' "\n''${YELLOW}Switched to NixOS generation ''${LIGHTCYAN}''${new_generation}''${RESET}\n"
 
-        # Restart Sway components that don't automatically reload.
-        swaymsg reload
+        # Reload i3.
+        i3-msg reload
 
-        # Restart Waybar.
-        pkill waybar 2>/dev/null || true
-        nohup waybar --config /etc/waybar/config --style /etc/waybar/style.css >/dev/null 2>&1 &
+        # Restart dunst.
+        pkill dunst 2>/dev/null || true
+        dunst >/dev/null 2>&1 &
 
         printf '%b\n' "''${LIGHTBLUE}Desktop reloaded.''${RESET}"
       }
@@ -1399,4 +1365,5 @@ in
   # ------ State version
 
   system.stateVersion = "23.11";
+
 }
