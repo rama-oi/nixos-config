@@ -33,6 +33,8 @@ let
 
   # ------ Vars :: Themes
 
+  username = "iqra";
+
   bashColors = {
     RESET = "0";
     BOLD = "1";
@@ -153,7 +155,6 @@ let
   packages = {
     desktop = with pkgs; [
       waybar
-      alacritty
       mako
       swaybg
       libnotify
@@ -167,6 +168,9 @@ let
     ];
 
     system = with pkgs; [
+      alacritty
+      st
+      
       rama.appC.fastfetch
       rama.appCpp.btop
       rama.appC.tmux
@@ -317,6 +321,7 @@ let
       veloren
       supertuxkart
       openra
+      rama.appGo.solitaire
     ];
 
     misc = with pkgs; [
@@ -370,7 +375,7 @@ let
 
     [[command]]
     label = "Jaiba Slim"
-    cmd = "alacritty --class floating-terminal -e jaiba --slim"
+    cmd = "st -c floating-terminal -e jaiba --slim"
     description = ""
 
     [[command]]
@@ -385,46 +390,51 @@ let
 
     [[command]]
     label = "Midnight Commander"
-    cmd = "alacritty -e mc"
+    cmd = "st -e mc"
     description = ""
 
     [[command]]
     label = "Impala"
-    cmd = "alacritty -e impala"
+    cmd = "st -e impala"
     description = ""
 
     [[command]]
     label = "Bluetui"
-    cmd = "alacritty -e bluetui"
+    cmd = "st -e bluetui"
     description = ""
 
     [[command]]
     label = "Wiremix"
-    cmd = "alacritty -e wiremix"
+    cmd = "st -e wiremix"
     description = ""
 
     [[command]]
     label = "Btop"
-    cmd = "alacritty -e btop"
+    cmd = "st -e btop"
     description = ""
 
     [[command]]
     label = "Caiman"
-    cmd = "alacritty -e caiman"
+    cmd = "st -e caiman"
     description = ""
 
     [[command]]
     label = "Fastfetch"
-    cmd = "alacritty -e fastfetch-launch"
+    cmd = "st -e fastfetch-launch"
     description = ""
 
     [[command]]
     label = "Calcurse"
-    cmd = "alacritty -e calcurse"
+    cmd = "st -e calcurse"
     description = ""
 
     [[command]]
     label = "------ Development"
+
+    [[command]]
+    label = "Alacritty"
+    cmd = "alacritty"
+    description = ""
 
     [[command]]
     label = "VSCodium"
@@ -448,17 +458,22 @@ let
 
     [[command]]
     label = "Kudu"
-    cmd = "alacritty -e kudu"
+    cmd = "st -e kudu"
     description = ""
 
     [[command]]
     label = "ResTerm"
-    cmd = "alacritty -e resterm"
+    cmd = "st -e resterm"
     description = ""
 
     [[command]]
     label = "Oxker"
-    cmd = "alacritty -e oxker"
+    cmd = "st -e oxker"
+    description = ""
+
+    [[command]]
+    label = "Virtual"
+    cmd = "xfreerdp /v:YOUR_SERVER /u:YOUR_USERNAME"
     description = ""
 
     [[command]]
@@ -466,7 +481,7 @@ let
 
     [[command]]
     label = "Cmus"
-    cmd = "alacritty -e cmus"
+    cmd = "st -e cmus"
     description = ""
 
     [[command]]
@@ -538,26 +553,31 @@ let
     description = ""
 
     [[command]]
+    label = "Solitaire"
+    cmd = "st -e solitaire-tui"
+    description = ""
+
+    [[command]]
     label = "------ Extras"
 
     [[command]]
     label = "Weathr"
-    cmd = "alacritty -e weathr"
+    cmd = "st -e weathr"
     description = ""
 
     [[command]]
     label = "Asciiquarium"
-    cmd = "alacritty -e asciiquarium"
+    cmd = "st -e asciiquarium"
     description = ""
 
     [[command]]
     label = "Matrix"
-    cmd = "alacritty -e matrix"
+    cmd = "st -e matrix"
     description = ""
 
     [[command]]
     label = "Polygon"
-    cmd = "alacritty -e polygon"
+    cmd = "st -e polygon"
     description = ""
 
     [[command]]
@@ -702,11 +722,11 @@ let
       '';
 
       coquiLaunch = pkgs.writeShellScriptBin "rama-coqui-launch" ''
-        if swaymsg '[app_id="^floating-terminal$"] focus' >/dev/null 2>&1; then
+        if swaymsg '[class="^floating-terminal$"] focus' >/dev/null 2>&1; then
           exit 0
         fi
 
-        exec alacritty --class floating-terminal -e coqui
+        exec st -c floating-terminal -e coqui
       '';
     };
 
@@ -903,7 +923,7 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "mrjackwills";
           repo = "oxker";
-          rev = "v0.13.4";
+          rev = "${version}";
           hash = "sha256-5tbH4bLP6xFG+mf7YRjQryV7kwi9CwCzTp0KXkD858E=";
         };
 
@@ -918,7 +938,7 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "Veirt";
           repo = "weathr";
-          rev = "v1.4.0";
+          rev = "${version}";
           hash = "sha256-BaG8K17RNuswtGx74CEBzMKjFMaNW0RZ5FjM3EfSVTE=";
         };
 
@@ -960,6 +980,21 @@ let
           pkgs.gitMinimal
         ];
 
+        doCheck = false;
+      };
+
+      solitaire = pkgs.buildGoModule rec {
+        pname = "solitaire-tui";
+        version = "unstable-2026-09-07";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "brianstrauch";
+          repo = "solitaire-tui";
+          rev = "45fffc4b13dbf1056f25a01c612dd835ddab5501";
+          hash = "sha256-xbqKtqFVvL+1x/SDoMEJ1LgnTy31LmZ/Je8K/bhP2bI=";
+        };
+
+        vendorHash = "sha256-jFbxT0ekimBNjIHGgMmCUrwZTS3Sdop/MFQMVdBF/38=";
         doCheck = false;
       };
     };
@@ -1201,15 +1236,15 @@ in
 {
   # ------ Home Config
   system.activationScripts.nixTheme = ''
-    install -d -m 0755 /home/iqra/.config/rama/themes
-    install -m 0644 ${nixTheme} /home/iqra/.config/rama/themes/nixos.toml
-    chown iqra\:users /home/iqra/.config/rama/themes/nixos.toml
+    install -d -m 0755 /home/${username}/.config/rama/themes
+    install -m 0644 ${nixTheme} /home/${username}/.config/rama/themes/nixos.toml
+    chown ${username}\:users /home/${username}/.config/rama/themes/nixos.toml
   '';
 
   system.activationScripts.coquiConfig = ''
-    install -d -m 0755 /home/iqra/.config/rama/
-    install -m 0644 ${coquiConfig} /home/iqra/.config/rama/coqui_config.toml
-    chown iqra\:users /home/iqra/.config/rama/coqui_config.toml
+    install -d -m 0755 /home/${username}/.config/rama/
+    install -m 0644 ${coquiConfig} /home/${username}/.config/rama/coqui_config.toml
+    chown ${username}\:users /home/${username}/.config/rama/coqui_config.toml
   '';
 
   # ------ Imports
@@ -1237,47 +1272,6 @@ in
     };
   };
 
-  services.xserver.xkb.extraLayouts.carey = {
-    description = "carey";
-    languages = [
-      "spa"
-      "fra"
-      "por"
-      "ita"
-      "ron"
-      "cat"
-      "glg"
-      "oci"
-      "srd"
-      "lld"
-      "roh"
-      "ast"
-      "arg"
-      "cos"
-      "wln"
-      "mwl"
-      "rup"
-    ];
-    symbolsFile = "${rama.app.carey}/xkb/symbols/carey";
-  };
-
-  # ------ Services :: PostgreSQL
-
-  services.postgresql = {
-    enable = true;
-
-    ensureDatabases = [
-      "iqra"
-    ];
-
-    ensureUsers = [
-      {
-        name = "iqra";
-        ensureDBOwnership = true;
-      }
-    ];
-  };
-
   # ------ Nix :: experimental features
 
   nix.settings.experimental-features = [
@@ -1294,23 +1288,25 @@ in
 
   # ------ Boot :: GRUB
   boot = {
-    loader.systemd-boot.enable = false;
+    loader = {
+      systemd-boot.enable = false;
 
-    loader.efi.canTouchEfiVariables = true;
+      efi.canTouchEfiVariables = true;
 
-    loader.grub = {
-      enable = true;
+      grub = {
+        enable = true;
 
-      efiSupport = true;
-      device = "nodev";
+        efiSupport = true;
+        device = "nodev";
 
-      gfxmodeEfi = "1920x1080";
-      gfxpayloadEfi = "keep";
+        gfxmodeEfi = "1920x1080";
+        gfxpayloadEfi = "keep";
 
-      timeoutStyle = "menu";
+        timeoutStyle = "menu";
 
-      configurationLimit = 10;
-      theme = grubTheme;
+        configurationLimit = 10;
+        theme = grubTheme;
+      };
     };
 
     initrd.luks.devices."luks-26f0579d-79fe-4ff9-96fa-f432718e7385".device =
@@ -1319,23 +1315,12 @@ in
 
   # ------ Hardware :: Audio
 
-  services = {
-    pulseaudio.enable = false;
-
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
-  };
-
   security.rtkit.enable = true;
 
   # ------ Networking
 
   networking = {
-    hostName = "iqra";
+    hostName = username;
     networkmanager.enable = false;
     wireless.iwd.enable = true;
   };
@@ -1344,9 +1329,9 @@ in
 
   # ------ Users
 
-  users.users.iqra = {
+  users.users.${username} = {
     isNormalUser = true;
-    description = "iqra";
+    description = username;
 
     extraGroups = [
       "wheel"
@@ -1354,14 +1339,77 @@ in
       "kvm"
       "docker"
     ];
-
   };
 
   # ------ Security
   security.sudo.extraConfig = ''
     Defaults timestamp_timeout=-1
   '';
-  services.getty.autologinUser = "iqra";
+
+  # ------ Services
+  services = {
+    xserver = {
+      enable = false;
+
+      xkb.extraLayouts.carey = {
+        description = "carey";
+        languages = [
+          "spa"
+          "fra"
+          "por"
+          "ita"
+          "ron"
+          "cat"
+          "glg"
+          "oci"
+          "srd"
+          "lld"
+          "roh"
+          "ast"
+          "arg"
+          "cos"
+          "wln"
+          "mwl"
+          "rup"
+        ];
+        symbolsFile = "${rama.app.carey}/xkb/symbols/carey";
+      };
+    };
+
+    # ------ Samsung Development
+    udev.extraRules = ''
+      SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", ATTR{idProduct}=="685d", TAG+="uaccess"
+    '';
+
+    postgresql = {
+      enable = true;
+
+      ensureDatabases = [
+        username
+      ];
+
+      ensureUsers = [
+        {
+          name = username;
+          ensureDBOwnership = true;
+        }
+      ];
+    };
+
+    pulseaudio.enable = false;
+
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
+
+    udisks2.enable = true;
+    gvfs.enable = true;
+
+    getty.autologinUser = username;
+  };
 
   # ------ XDG portals
 
@@ -1373,21 +1421,16 @@ in
     ];
   };
 
-  xdg.terminal-exec = {
-    enable = true;
-    settings = {
-      default = [
-        "Alacritty.desktop"
-      ];
-    };
-  };
+  # xdg.terminal-exec = {
+  #   enable = true;
+  #   settings = {
+  #     default = [
+  #       "Alacritty.desktop"
+  #     ];
+  #   };
+  # };
 
   # ------ Storage
-
-  services = {
-    udisks2.enable = true;
-    gvfs.enable = true;
-  };
 
   environment.pathsToLink = [
     "share/thumbnailers"
@@ -1408,8 +1451,6 @@ in
   # programs.virt-manager.enable = true;
 
   # ------ Program :: Sway
-
-  services.xserver.enable = false;
 
   programs.sway = {
     enable = true;
@@ -1464,7 +1505,7 @@ in
     gaps outer ${theme.spacing.sm}
 
     # Terminal
-    bindsym $mod+z exec alacritty
+    bindsym $mod+z exec st
 
     # Application launcher
     bindsym $mod+space exec rama-coqui-launch
@@ -1476,7 +1517,7 @@ in
     bindsym $mod+r reload
 
     # Floating Terminals
-    for_window [app_id="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
+    for_window [class="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
 
     # Power
     bindsym $mod+Escape exec swaynag \
@@ -1572,7 +1613,7 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
-      "on-click" = "alacritty -e wiremix";
+      "on-click" = "st -e wiremix";
     };
 
     "sway/workspaces" = {
@@ -1597,7 +1638,7 @@ in
       "format-wifi" = "wf:{essid}:{signalStrength}%";
       "format-ethernet" = "eth:{ifname}";
       "format-disconnected" = "wf:0";
-      "on-click" = "alacritty -e impala";
+      "on-click" = "st -e impala";
       tooltip = false;
     };
 
@@ -1607,13 +1648,13 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
-      "on-click" = "alacritty -e bluetui";
+      "on-click" = "st -e bluetui";
     };
 
     "sway/language" = {
       format = "kbd:{short}";
       tooltip = false;
-      "on-click" = "alacritty -e caiman";
+      "on-click" = "st -e caiman";
     };
 
     backlight = {
@@ -1626,7 +1667,7 @@ in
       format = "snd:{volume}%";
       "format-muted" = "snd:{volume}%";
       tooltip = false;
-      "on-click" = "alacritty -e wiremix";
+      "on-click" = "st -e wiremix";
     };
 
     battery = {
@@ -1635,7 +1676,7 @@ in
       "format-charging" = "bat:{capacity}%";
       "format-full" = "bat:{capacity}%";
       tooltip = false;
-      "on-click" = "alacritty -e btop";
+      "on-click" = "st -e btop";
 
       states = {
         warning = 20;
@@ -1648,14 +1689,14 @@ in
       format = "{temperatureF}°F";
       "critical-threshold" = 80;
       tooltip = false;
-      "on-click" = "alacritty -e btop";
+      "on-click" = "st -e btop";
     };
 
     clock = {
       interval = 1;
       format = "{:%m/%d | %H:%M}";
       tooltip = false;
-      "on-click" = "alacritty -e calcurse";
+      "on-click" = "st -e calcurse";
     };
   };
 
@@ -1848,12 +1889,6 @@ in
       PS1="\[$DIR\]\w\[$RESET\]\[$CMD\]\$\[$RESET\] "
     '';
   };
-
-  # ------ Samsung Development
-
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", ATTR{idProduct}=="685d", TAG+="uaccess"
-  '';
 
   # ------ State version
 
