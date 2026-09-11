@@ -1329,6 +1329,18 @@ in
     promptInit = ''
       ${bashColorInit}
 
+      record() {
+      clear
+      timestamp=$(date '+%Y-%m-%d_%H-%M-%S')
+      ffmpeg \
+        -f x11grab \
+        -video_size 1024x600 \
+        -i "$DISPLAY" \
+        -f pulse \
+        -i default \
+        "$HOME/Videos/screen-$timestamp.mp4"
+      }
+
       update() {
         clear
 
