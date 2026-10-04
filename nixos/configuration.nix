@@ -129,8 +129,8 @@ let
   theme = {
     # current = themes.tokyoNight;
     current = themes.catppuccinMocha // {
-      # accent20 = "#f5c2e7"; # pink
-      accent20 = "#89b4fa"; # blue
+      accent20 = "#f5c2e7"; # pink
+      # accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
@@ -160,6 +160,7 @@ let
       libnotify
       nemo-with-extensions
       mc
+      mousepad
     ];
 
     themes = with pkgs; [
@@ -169,8 +170,8 @@ let
 
     system = with pkgs; [
       alacritty
-      st
-      
+      foot
+
       rama.appC.fastfetch
       rama.appCpp.btop
       rama.appC.tmux
@@ -322,6 +323,11 @@ let
       supertuxkart
       openra
       rama.appGo.solitaire
+      neverball
+      # extremetuxracer
+      torcs
+      openttd
+      # aisleriot
     ];
 
     misc = with pkgs; [
@@ -374,8 +380,13 @@ let
     label = "------ Utilities"
 
     [[command]]
+    label = "Mousepad"
+    cmd = "mousepad"
+    description = ""
+
+    [[command]]
     label = "Jaiba Slim"
-    cmd = "st -c floating-terminal -e jaiba --slim"
+    cmd = "foot --app-id=floating-terminal -e jaiba --slim"
     description = ""
 
     [[command]]
@@ -390,42 +401,42 @@ let
 
     [[command]]
     label = "Midnight Commander"
-    cmd = "st -e mc"
+    cmd = "foot -e mc"
     description = ""
 
     [[command]]
     label = "Impala"
-    cmd = "st -e impala"
+    cmd = "foot -e impala"
     description = ""
 
     [[command]]
     label = "Bluetui"
-    cmd = "st -e bluetui"
+    cmd = "foot -e bluetui"
     description = ""
 
     [[command]]
     label = "Wiremix"
-    cmd = "st -e wiremix"
+    cmd = "foot -e wiremix"
     description = ""
 
     [[command]]
     label = "Btop"
-    cmd = "st -e btop"
+    cmd = "foot -e btop"
     description = ""
 
     [[command]]
     label = "Caiman"
-    cmd = "st -e caiman"
+    cmd = "foot -e caiman"
     description = ""
 
     [[command]]
     label = "Fastfetch"
-    cmd = "st -e fastfetch-launch"
+    cmd = "foot -e fastfetch-launch"
     description = ""
 
     [[command]]
     label = "Calcurse"
-    cmd = "st -e calcurse"
+    cmd = "foot -e calcurse"
     description = ""
 
     [[command]]
@@ -458,17 +469,17 @@ let
 
     [[command]]
     label = "Kudu"
-    cmd = "st -e kudu"
+    cmd = "foot -e kudu"
     description = ""
 
     [[command]]
     label = "ResTerm"
-    cmd = "st -e resterm"
+    cmd = "foot -e resterm"
     description = ""
 
     [[command]]
     label = "Oxker"
-    cmd = "st -e oxker"
+    cmd = "foot -e oxker"
     description = ""
 
     [[command]]
@@ -476,7 +487,7 @@ let
 
     [[command]]
     label = "Cmus"
-    cmd = "st -e cmus"
+    cmd = "foot -e cmus"
     description = ""
 
     [[command]]
@@ -549,7 +560,22 @@ let
 
     [[command]]
     label = "Solitaire"
-    cmd = "st -e solitaire-tui"
+    cmd = "foot -e solitaire-tui"
+    description = ""
+
+    [[command]]
+    label = "OpenTTD"
+    cmd = "openttd"
+    description = ""
+
+    [[command]]
+    label = "Neverball"
+    cmd = "neverball"
+    description = ""
+
+    [[command]]
+    label = "Torcs"
+    cmd = "torcs"
     description = ""
 
     [[command]]
@@ -557,22 +583,22 @@ let
 
     [[command]]
     label = "Weathr"
-    cmd = "st -e weathr"
+    cmd = "foot -e weathr"
     description = ""
 
     [[command]]
     label = "Asciiquarium"
-    cmd = "st -e asciiquarium"
+    cmd = "foot -e asciiquarium"
     description = ""
 
     [[command]]
     label = "Matrix"
-    cmd = "st -e matrix"
+    cmd = "foot -e matrix"
     description = ""
 
     [[command]]
     label = "Polygon"
-    cmd = "st -e polygon"
+    cmd = "foot -e polygon"
     description = ""
 
     [[command]]
@@ -717,11 +743,11 @@ let
       '';
 
       coquiLaunch = pkgs.writeShellScriptBin "rama-coqui-launch" ''
-        if swaymsg '[class="^floating-terminal$"] focus' >/dev/null 2>&1; then
+        if swaymsg '[app_id="floating-terminal"]' focus >/dev/null 2>&1; then
           exit 0
         fi
 
-        exec st -c floating-terminal -e coqui
+        exec foot --app-id=floating-terminal -e coqui
       '';
     };
 
@@ -1102,6 +1128,11 @@ let
   androidComposition = pkgs.androidenv.composeAndroidPackages {
     platformVersions = [
       "10"
+      "11"
+      "12"
+      "13"
+      "14"
+      "15"
       "16"
       "21"
       "36"
@@ -1500,7 +1531,7 @@ in
     gaps outer ${theme.spacing.sm}
 
     # Terminal
-    bindsym $mod+z exec st
+    bindsym $mod+z exec foot
 
     # Application launcher
     bindsym $mod+space exec rama-coqui-launch
@@ -1512,7 +1543,7 @@ in
     bindsym $mod+r reload
 
     # Floating Terminals
-    for_window [class="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
+    for_window [app_id="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
 
     # Power
     bindsym $mod+Escape exec swaynag \
@@ -1608,7 +1639,7 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
-      "on-click" = "st -e wiremix";
+      "on-click" = "foot -e wiremix";
     };
 
     "sway/workspaces" = {
@@ -1633,7 +1664,7 @@ in
       "format-wifi" = "wf:{essid}:{signalStrength}%";
       "format-ethernet" = "eth:{ifname}";
       "format-disconnected" = "wf:0";
-      "on-click" = "st -e impala";
+      "on-click" = "foot -e impala";
       tooltip = false;
     };
 
@@ -1643,13 +1674,13 @@ in
       "return-type" = "json";
       format = "{}";
       tooltip = false;
-      "on-click" = "st -e bluetui";
+      "on-click" = "foot -e bluetui";
     };
 
     "sway/language" = {
       format = "kbd:{short}";
       tooltip = false;
-      "on-click" = "st -e caiman";
+      "on-click" = "foot -e caiman";
     };
 
     backlight = {
@@ -1662,7 +1693,7 @@ in
       format = "snd:{volume}%";
       "format-muted" = "snd:{volume}%";
       tooltip = false;
-      "on-click" = "st -e wiremix";
+      "on-click" = "foot -e wiremix";
     };
 
     battery = {
@@ -1671,7 +1702,7 @@ in
       "format-charging" = "bat:{capacity}%";
       "format-full" = "bat:{capacity}%";
       tooltip = false;
-      "on-click" = "st -e btop";
+      "on-click" = "foot -e btop";
 
       states = {
         warning = 20;
@@ -1684,14 +1715,14 @@ in
       format = "{temperatureF}°F";
       "critical-threshold" = 80;
       tooltip = false;
-      "on-click" = "st -e btop";
+      "on-click" = "foot -e btop";
     };
 
     clock = {
       interval = 1;
       format = "{:%m/%d | %H:%M}";
       tooltip = false;
-      "on-click" = "st -e calcurse";
+      "on-click" = "foot -e calcurse";
     };
   };
 

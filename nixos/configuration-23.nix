@@ -96,12 +96,11 @@ let
       dmenu
       dunst
       libnotify
-      nemo
+      caja
       mc
     ];
 
     themes = with pkgs; [
-      dracula-theme
       adwaita-icon-theme
     ];
 
@@ -720,31 +719,6 @@ let
 
   };
 
-  # ------ Android SDK
-
-  androidComposition = pkgs.androidenv.composeAndroidPackages {
-    platformVersions = [
-      "10"
-      "16"
-      "21"
-      "36"
-      "37"
-    ];
-
-    abiVersions = [
-      "x86_64"
-      "x86"
-    ];
-
-    includeEmulator = true;
-    includeSystemImages = true;
-    systemImageTypes = [ "default" ];
-    includeNDK = true;
-    includeSources = false;
-  };
-
-  androidSdk = androidComposition.androidsdk;
-
   # ------ GRUB :: Catppuccin Mocha Theme
 
   grubTheme = pkgs.runCommand "rama-grub-theme" { } ''
@@ -921,12 +895,12 @@ in
 
   boot = {
     loader = {
-      systemd-boot.enable = false;
-      efi.canTouchEfiVariables = true;
+      # systemd-boot.enable = false;
+      # efi.canTouchEfiVariables = true;
 
       grub = {
         enable = true;
-        efiSupport = true;
+        # efiSupport = true;
         device = "nodev";
 
         gfxmodeEfi = "1024x600";
@@ -1093,9 +1067,6 @@ in
     exec --no-startup-id rama-battery-monitor
 
     exec --no-startup-id bluetoothctl power off
-
-    # GTK theme
-    exec --no-startup-id gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'
 
     # Window decorations
 
