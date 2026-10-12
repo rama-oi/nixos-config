@@ -775,7 +775,7 @@ let
           owner = "rama-oi";
           repo = "caiman";
           rev = "b64a52c2487187890c93da6707713252abfa32b8";
-          hash = "sha256-hYYCITxCqLQyu1u39LUIuO/BxhUzFT/NLGjDiZfHgUw=";
+          hash = "sha256-lpPClOtDLy2mf9ug2P+8FDONEv63piO61QFBJPWsJmA=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -833,7 +833,7 @@ let
           owner = "rama-oi";
           repo = "matrix";
           rev = "master";
-          hash = "sha256-qBzyQrxQepN/lLtvuM7JFNTZma/vzQ/oNkB9EEWGqzA=";
+          hash = "sha256-oXzmUGbpR8nrB/4jzXNEIooLFwDMsesyxfciaxJ95Ps=";
         };
 
         dontBuild = true;
@@ -900,10 +900,10 @@ let
           owner = "pythops";
           repo = "impala";
           rev = "f5f74d5fc25090a4e25e96de1a7ddaae6ce0f9ca";
-          hash = "sha256-VjiXrjhmgCqCDEgDLWA2W6ppblMu/Cy6MUAS1uQQJuY=";
+          hash = "sha256-cxgPFLg//fwsPehyIhhP8AQLRnM3KQ8Th7+BpGlJfi8=";
         };
 
-        cargoHash = "sha256-9dMl0U/HEr3w6Gc26qHY87ULneD2Jw2OFgxHRwwTol0=";
+        cargoHash = "sha256-URReJVoE4CN+utSX58nbfhJxClWLbCvWFLgYF00JXWg=";
         doCheck = false;
       };
 
@@ -1072,7 +1072,7 @@ let
           owner = "tmux";
           repo = "tmux";
           rev = "master";
-          hash = "sha256-b7Zo3PGMU1Tlbj1yrSSx2gUGTdETCmPj3GkeOa/i9pQ=";
+          hash = "sha256-8iHDI0CVcJLcLIaMhgJEI0V5HZ7rKMCjYIEXNgEOrhI=";
         };
         nativeBuildInputs = with pkgs; [
           autoconf
