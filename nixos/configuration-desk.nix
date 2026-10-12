@@ -27,8 +27,6 @@ let
       builtins.concatStringsSep "" (
         builtins.map (selector: renderRule selector rules.${selector}) (builtins.attrNames rules)
       );
-    # svg = { };
-    # toml = { };
   };
 
   # ------ Vars :: Themes
@@ -71,58 +69,6 @@ let
       danger = "#f38ba8"; # red
       warning = "#fab387"; # peach
       success = "#a6e3a1"; # green
-    };
-
-    melangeDark = {
-      bg = "#161413";
-      bgDark = "#221C18";
-      bgAlt = "#322B24";
-      fg = "#ECE1D7";
-      muted = "#9C9187";
-      accent10 = "#EBC06E";
-      accent20 = "#D49A3A";
-      danger = "#B65C60";
-      warning = "#E49B5D";
-      success = "#8CBBA1";
-    };
-
-    pomboverso = {
-      bg = "#2E2C42";
-      bgDark = "#2C2336";
-      bgAlt = "#342A44";
-      fg = "#ECE3F6";
-      muted = "#B7AFD1";
-      accent10 = "#B78ED7";
-      accent20 = "#E081D8";
-      danger = "#E081D8";
-      warning = "#EC7CA7";
-      success = "#B7AFD1";
-    };
-
-    tokyoNight = {
-      bg = "#1A1B26";
-      bgDark = "#3A524A";
-      bgAlt = "#567468";
-      fg = "#C0CAF5";
-      muted = "#789488";
-      accent10 = "#7AA2F7";
-      accent20 = "#64A0D2";
-      danger = "#F7768E";
-      warning = "#FF9E64";
-      success = "#9ECE6A";
-    };
-
-    dracula = {
-      bg = "#282A36";
-      bgDark = "#363849";
-      bgAlt = "#424450";
-      fg = "#F8F8F2";
-      muted = "#4F5163";
-      accent10 = "#BD93F8";
-      accent20 = "#8BE9FB";
-      danger = "#FF79C6";
-      warning = "#FFB86C";
-      success = "#50FA7B";
     };
   };
 
@@ -294,18 +240,6 @@ let
       darktable
       imv
       cmus
-
-      # oxipng
-      # pngquant
-      # jpegoptim
-      # svgo
-
-      # webp-pixbuf-loader
-      # gdk-pixbuf
-      # xarchiver
-      # pcmanfm
-      # lxmenu-data
-
     ];
 
     media = with pkgs; [
@@ -324,10 +258,8 @@ let
       openra
       rama.appGo.solitaire
       neverball
-      # extremetuxracer
       torcs
       openttd
-      # aisleriot
     ];
 
     misc = with pkgs; [
@@ -655,42 +587,11 @@ let
 
   rama = {
     script = {
-      # waybarQuote = pkgs.writeShellScriptBin "rama-waybar-quote" ''
-      #   quotes=(
-      #     "be the problem you want to see in the world"
-      #     "the horrors persist, but so do i"
-      #     "wake up. commit nonsense."
-      #     "have you tried turning yourself off and on again?"
-      #     "god gives his hardest battles to his silliest soldiers"
-      #     "another day, another poor decision"
-      #   )
-
-      #   printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
-      # '';
-
       waybarBluetooth = pkgs.writeShellScriptBin "rama-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
           printf '{"text":"bt:1","class":"bt-on"}'
         else
           printf '{"text":"bt:0","class":"bt-off"}'
-        fi
-      '';
-
-      waybarCamera = pkgs.writeShellScriptBin "rama-waybar-camera" ''
-        if ls /dev/video* >/dev/null 2>&1; then
-          printf '{"text":"cam:1","class":"active"}'
-        else
-          printf '{"text":"cam:0","class":"inactive"}'
-        fi
-      '';
-
-      waybarMicrophone = pkgs.writeShellScriptBin "rama-waybar-microphone" ''
-        mic=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ 2>/dev/null)
-
-        if echo "$mic" | grep -q MUTED; then
-          printf '{"text":"mic:0","class":"inactive"}'
-        else
-          printf '{"text":"mic:1","class":"active"}'
         fi
       '';
 
@@ -704,37 +605,6 @@ let
             iwctl device wlan0 set-property Powered on
             notify-send "Radio" "Wi-Fi enabled"
           fi
-      '';
-
-      batteryMonitor = pkgs.writeShellScriptBin "rama-battery-monitor" ''
-        BATTERY="/sys/class/power_supply/BAT0"
-        THRESHOLD=10
-        STATE_FILE="''${XDG_RUNTIME_DIR}/battery-notified"
-
-        while true; do
-          if [ -r "$BATTERY/capacity" ] && [ -r "$BATTERY/status" ]; then
-            capacity=$(cat "$BATTERY/capacity")
-            status=$(cat "$BATTERY/status")
-
-            if [ "$capacity" -le "$THRESHOLD" ] && [ "$status" = "Discharging" ]; then
-              if [ ! -f "$STATE_FILE" ]; then
-                notify-send \
-                  -u critical \
-                  -i battery-caution \
-                  "Low Battery" \
-                  "Battery is at ''${capacity}%"
-
-                touch "$STATE_FILE"
-              fi
-            else
-              # Reset the notification once the battery is charged
-              # or goes above the threshold.
-              rm -f "$STATE_FILE"
-            fi
-          fi
-
-          sleep 30
-        done
       '';
 
       fastfetchLaunch = pkgs.writeShellScriptBin "fastfetch-launch" ''
@@ -1425,6 +1295,23 @@ in
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
+
+      wireplumber.extraConfig."disable-microphone" = {
+        "monitor.alsa.rules" = [
+          {
+            matches = [
+              {
+                "node.name" = "~alsa_input.*";
+              }
+            ];
+            actions = {
+              update-props = {
+                "device.disabled" = true;
+              };
+            };
+          }
+        ];
+      };
     };
 
     udisks2.enable = true;
@@ -1468,10 +1355,6 @@ in
     ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
   };
 
-  # ------ Virtualization
-  # virtualisation.libvirtd.enable = true;
-  # programs.virt-manager.enable = true;
-
   # ------ Program :: Sway
 
   programs.sway = {
@@ -1491,7 +1374,6 @@ in
 
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
-    exec rama-battery-monitor
     exec bluetoothctl power off
     exec swaybg -c '${theme.current.accent20}'
 
@@ -1559,9 +1441,6 @@ in
     bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
     bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
 
-    # Microphone
-    bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-
     # Brightness
     bindsym --locked XF86MonBrightnessDown exec brightnessctl set 1%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 1%+
@@ -1604,39 +1483,13 @@ in
     "modules-right" = [
       "network"
       "custom/bluetooth"
-      "custom/camera"
-      "custom/microphone"
       "sway/language"
       "backlight"
       "pulseaudio"
-      "battery"
       "temperature"
       "clock"
       "custom/msg"
     ];
-
-    # "custom/msg" = {
-    #   exec = "${rama.script.waybarQuote}/bin/rama-waybar-quote";
-    #   format = ":: {} ::";
-    #   tooltip = false;
-    # };
-
-    "custom/camera" = {
-      exec = "${rama.script.waybarCamera}/bin/rama-waybar-camera";
-      interval = 2;
-      "return-type" = "json";
-      format = "{}";
-      tooltip = false;
-    };
-
-    "custom/microphone" = {
-      exec = "${rama.script.waybarMicrophone}/bin/rama-waybar-microphone";
-      interval = 2;
-      "return-type" = "json";
-      format = "{}";
-      tooltip = false;
-      "on-click" = "foot -e wiremix";
-    };
 
     "sway/workspaces" = {
       "disable-scroll" = true;
@@ -1690,20 +1543,6 @@ in
       "format-muted" = "snd:{volume}%";
       tooltip = false;
       "on-click" = "foot -e wiremix";
-    };
-
-    battery = {
-      interval = 10;
-      format = "bat:{capacity}%";
-      "format-charging" = "bat:{capacity}%";
-      "format-full" = "bat:{capacity}%";
-      tooltip = false;
-      "on-click" = "foot -e btop";
-
-      states = {
-        warning = 20;
-        critical = 10;
-      };
     };
 
     temperature = {
@@ -1790,23 +1629,17 @@ in
       "min-width" = "70px";
     };
 
-    "#custom-bluetooth.bt-on, #pulseaudio.muted, #battery.critical, #custom-camera.active, #custom-microphone.active" =
-      {
-        "color" = theme.current.bg;
-        "background-color" = theme.current.danger;
-      };
-
-    "#battery.warning" = {
+    "#custom-bluetooth.bt-on, #pulseaudio.muted" = {
       "color" = theme.current.bg;
-      "background-color" = theme.current.warning;
+      "background-color" = theme.current.danger;
     };
 
-    "#battery.charging, #temperature" = {
+    "#temperature" = {
       "color" = theme.current.bg;
       "background-color" = theme.current.success;
     };
 
-    "#network:hover, #custom-bluetooth:hover, #custom-microphone:hover, #language:hover, #pulseaudio:hover, #battery:hover, #temperature:hover, #clock:hover" =
+    "#network:hover, #custom-bluetooth:hover, #language:hover, #pulseaudio:hover, #temperature:hover, #clock:hover" =
       {
         "color" = theme.current.bg;
         "background-color" = theme.current.accent20;
