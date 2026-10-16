@@ -161,6 +161,7 @@ let
       nemo-with-extensions
       mc
       mousepad
+      rama.appGo.tilekeeper
     ];
 
     themes = with pkgs; [
@@ -272,7 +273,6 @@ let
 
     containers = with pkgs; [
       docker
-
       rama.appRust.oxker
     ];
 
@@ -289,6 +289,13 @@ let
       gimp
       inkscape
       kdePackages.kdenlive
+      rama.appRust.photocraft
+      rama.appRust.vectorcraft
+      rama.appRust.cadcraft
+      rama.appRust.effectcraft
+      rama.appRust.filmcraft
+      rama.appRust.designcraft
+      rama.appRust.lightcraft
 
       imagemagick
       darktable
@@ -526,6 +533,41 @@ let
     description = ""
 
     [[command]]
+    label = "Photocraft"
+    cmd = "photocraft"
+    description = ""
+
+    [[command]]
+    label = "Vectorcraft"
+    cmd = "vectorcraft"
+    description = ""
+
+    [[command]]
+    label = "Cadcraft"
+    cmd = "cadcraft"
+    description = ""
+
+    [[command]]
+    label = "Effectcraft"
+    cmd = "effectcraft"
+    description = ""
+
+    [[command]]
+    label = "Filmcraft"
+    cmd = "filmcraft"
+    description = ""
+
+    [[command]]
+    label = "Designcraft"
+    cmd = "designcraft"
+    description = ""
+
+    [[command]]
+    label = "Lightcraft"
+    cmd = "lightcraft"
+    description = ""
+
+    [[command]]
     label = "------ Games"
 
     [[command]]
@@ -620,6 +662,43 @@ let
     description = ""
   '';
 
+    # ------ Home Config
+
+  tilekeeperConfig = pkgs.writeText "tilekeeper-config.toml" ''
+    [tilekeeper]
+    defaultLayout = "MasterStack"
+    stackSide = "righ"
+    masterWidth = 50
+    visibleStackLimit = 0
+
+    [workspace.1]
+    defaultLayout = "MasterStack"
+
+    [workspace.2]
+    defaultLayout = "MasterStack"
+
+    [workspace.3]
+    defaultLayout = "MasterStack"
+
+    [workspace.4]
+    defaultLayout = "MasterStack"
+
+    [workspace.5]
+    defaultLayout = "MasterStack"
+
+    [workspace.6]
+    defaultLayout = "MasterStack"
+
+    [workspace.7]
+    defaultLayout = "MasterStack"
+
+    [workspace.8]
+    defaultLayout = "MasterStack"
+
+    [workspace.9]
+    defaultLayout = "MasterStack"
+  '';
+
   nixTheme = pkgs.writeText "nixos.toml" ''
     theme = "nixos"
 
@@ -651,23 +730,89 @@ let
     shell_shadow = "#313244"
   '';
 
+  # ------ Builders :: Rust Desktop Apps
+
+  storytoldRustDesktop =
+    {
+      pname,
+      version,
+      hash,
+      cargoHash,
+      ...
+    }:
+    pkgs.rustPlatform.buildRustPackage {
+      inherit pname version;
+
+      src = pkgs.fetchFromGitHub {
+        owner = "storytold";
+        repo = pname;
+        rev = "v${version}";
+        inherit hash;
+      };
+
+      inherit cargoHash;
+
+      doCheck = false;
+
+      nativeBuildInputs = with pkgs; [
+        pkg-config
+        makeWrapper
+      ];
+
+      buildInputs = with pkgs; [
+        # Audio
+        alsa-lib
+
+        # Wayland and X11
+        wayland
+        libxkbcommon
+        libX11
+        libXcursor
+        libXrandr
+        libXi
+        libxcb
+        libxkbfile
+
+        # Graphics
+        libGL
+        vulkan-loader
+
+        # GTK and fonts
+        gtk3
+        fontconfig
+        freetype
+      ];
+
+      postFixup = ''
+        wrapProgram $out/bin/${pname} \
+         --prefix LD_LIBRARY_PATH : ${
+           pkgs.lib.makeLibraryPath (
+             with pkgs;
+             [
+               alsa-lib
+               wayland
+               libxkbcommon
+               libGL
+               libglvnd
+               vulkan-loader
+               libX11
+               libXcursor
+               libXrandr
+               libXi
+               libxcb
+               gtk3
+               fontconfig
+               freetype
+             ]
+           )
+         }
+      '';
+    };
+
   # ------ Custom Scripts
 
   rama = {
-    script = {
-      # waybarQuote = pkgs.writeShellScriptBin "rama-waybar-quote" ''
-      #   quotes=(
-      #     "be the problem you want to see in the world"
-      #     "the horrors persist, but so do i"
-      #     "wake up. commit nonsense."
-      #     "have you tried turning yourself off and on again?"
-      #     "god gives his hardest battles to his silliest soldiers"
-      #     "another day, another poor decision"
-      #   )
-
-      #   printf '%s\n' "''${quotes[@]}" | ${pkgs.coreutils}/bin/shuf -n 1
-      # '';
-
+    script = {  
       waybarBluetooth = pkgs.writeShellScriptBin "rama-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
           printf '{"text":"bt:1","class":"bt-on"}'
@@ -966,6 +1111,55 @@ let
         cargoHash = "sha256-xIjFleANgzoTS+4Yky+mvtX1IeU6IdaH1YuB8W8bYIo=";
         doCheck = false;
       };
+
+      photocraft = storytoldRustDesktop {
+        pname = "photocraft";
+        version = "0.8.0";
+        hash = "sha256-jjQXjLLAg1hfp9Ikw/f8TmmG7hWOa/zaxA5u2oVB+dQ=";
+        cargoHash = "sha256-X5AB6CkTqlwpBSjFqNwMBvUZmYGzeFLVMlqGUscztNI=";
+      };
+
+      vectorcraft = storytoldRustDesktop {
+        pname = "vectorcraft";
+        version = "0.6.0";
+        hash = "sha256-X93323XP5NsLlnrJXEb3glFqgXKwWafTYmX/L8Wxofs=";
+        cargoHash = "sha256-xn6L3VaWBzUHt5PXsDa+p6rFincXa5oB04Dcag3vAB4=";
+      };
+
+      cadcraft = storytoldRustDesktop {
+        pname = "cadcraft";
+        version = "0.4.0";
+        hash = "sha256-TbJdAijdj8TqP0M4hsHyrIfPAIDp39m08DlTAWDZDis=";
+        cargoHash = "sha256-EMUJN8u+FTNvRju4Go+9Lo8uXzlm4Ou7uWE8k4JQ9NY=";
+      };
+
+      effectcraft = storytoldRustDesktop {
+        pname = "effectcraft";
+        version = "0.7.0";
+        hash = "sha256-4Yv2dcN8DSLzF2QTmz3FCW3Hr7yFMemjxEgCW7jTGeU=";
+        cargoHash = "sha256-BqmywAtIP6yuNV+qKxZD7eEiMA5g7wDglKYi9/wtUwU=";
+      };
+
+      filmcraft = storytoldRustDesktop {
+        pname = "filmcraft";
+        version = "0.5.0";
+        hash = "sha256-X/pSYTJbacvEqnVrLgTROo0PVYNZirdNwPhlANk+AgI=";
+        cargoHash = "sha256-uyTw0UKRUlASLuVR1PrHRcbBg1o0zaLrFvDau7tbzc0=";
+      };
+
+      designcraft = storytoldRustDesktop {
+        pname = "designcraft";
+        version = "0.5.0";
+        hash = "sha256-aU3DEa+DPKy/ySBhyaCS/7G1QRONYwCmDnXIJhindWE=";
+        cargoHash = "sha256-6aa9qlA7d707bKMnqki5W+12xUF23OM/mIUD1ZowNDI=";
+      };
+
+      lightcraft = storytoldRustDesktop {
+        pname = "lightcraft";
+        version = "0.5.0";
+        hash = "sha256-N/V/MIf+8u9zCytsWLIr4muXjmrqfc+o78PFUFhlQS8=";
+        cargoHash = "sha256-IAhOBq6dnMmbmZFVv4UQh2wmt2hNKYmWJ1PhTFI4dsU=";
+      };
     };
 
     appGo = {
@@ -976,11 +1170,28 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "unkn0wn-root";
           repo = "resterm";
-          rev = "v1.2.4";
+          rev = "${version}";
           hash = "sha256-vp1/yWDqx8fQp4NifjENr/x8e0TVSRlLYv7TshfwC2Y=";
         };
 
         vendorHash = "sha256-AYe9qB4t1ocL3qQpwXz1Rm91q238rD68ewcwjUxO9nM=";
+        doCheck = false;
+      };
+
+      tilekeeper = pkgs.buildGoModule rec {
+        pname = "tilekeeper";
+        version = "v0.1.2";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "mschulkind-oss";
+          repo = "tilekeeper";
+          rev = "${version}";
+          hash = "sha256-3EU2b/xHaEaIwZgFALjTmr8GcYzZ2QV6ulELnklOYL8=";
+        };
+
+        subPackages = [ "cmd/tilekeeper" ];
+
+        vendorHash = "sha256-pbA/AlBz3cQYRTMnQ/qBPcinYOKokrBLNhkbRTq54gE=";
         doCheck = false;
       };
 
@@ -1261,6 +1472,14 @@ let
 in
 {
   # ------ Home Config
+  system.activationScripts.tilekeeperConfig = ''
+    install -d -m 0755 /home/${username}/.config/tilekeeper
+    install -m 0644 ${tilekeeperConfig} \
+      /home/${username}/.config/tilekeeper/config.toml
+    chown ${username}:users \
+      /home/${username}/.config/tilekeeper/config.toml
+  '';
+  
   system.activationScripts.nixTheme = ''
     install -d -m 0755 /home/${username}/.config/rama/themes
     install -m 0644 ${nixTheme} /home/${username}/.config/rama/themes/nixos.toml
@@ -1492,6 +1711,10 @@ in
     # Startup
     exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP=sway
     exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+
+    # tilekeeper
+    exec tilekeeper daemon
+    bindsym $mod+m nop tilekeeper swap-master
 
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
@@ -1871,10 +2094,16 @@ in
       ".." = "cd ..";
       weathr = "weathr --simulate thunderstorm --hide-hud";
       lotus = "lotus-test";
+      restart_audio = "systemctl --user restart wireplumber
+";
     };
 
     promptInit = ''
       ${bashColorInit}
+
+      cm() {
+        GIT_AUTHOR_DATE="1986-11-18T01:00:00" GIT_COMMITTER_DATE="1986-11-18T01:00:00" git commit -m "V$1"
+      }
 
       record() {
         clear
