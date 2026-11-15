@@ -129,8 +129,8 @@ let
   theme = {
     # current = themes.tokyoNight;
     current = themes.catppuccinMocha // {
-      accent20 = "#f5c2e7"; # pink
-      # accent20 = "#89b4fa"; # blue
+      # accent20 = "#f5c2e7"; # pink
+      accent20 = "#89b4fa"; # blue
       # accent20 = "#f38ba8"; # red
       # accent20 = "#a6e3a1"; # green
       # accent20 = "#fab387"; # peach
@@ -217,12 +217,12 @@ let
 
     development = with pkgs; [
       git
-      vscodium
       nodejs_26
       github-desktop
       nixfmt
 
       rama.appGo.lazygit
+      vscodium.fhs
     ];
 
     developmentPascal = with pkgs; [
@@ -242,6 +242,10 @@ let
       nim
     ];
 
+    developmentJava = with pkgs; [
+      jdk
+    ];
+
     developmentSql = with pkgs; [
       postgresql
     ];
@@ -257,6 +261,10 @@ let
 
     developmentGo = with pkgs; [
       go
+    ];
+
+    developmentZig = with pkgs; [
+      zig
     ];
 
     developmentAndroid = with pkgs; [
@@ -290,12 +298,12 @@ let
       inkscape
       kdePackages.kdenlive
       rama.appRust.photocraft
-      rama.appRust.vectorcraft
-      rama.appRust.cadcraft
-      rama.appRust.effectcraft
       rama.appRust.filmcraft
-      rama.appRust.designcraft
-      rama.appRust.lightcraft
+      # rama.appRust.vectorcraft
+      # rama.appRust.cadcraft
+      # rama.appRust.effectcraft
+      # rama.appRust.designcraft
+      # rama.appRust.lightcraft
 
       imagemagick
       darktable
@@ -662,7 +670,7 @@ let
     description = ""
   '';
 
-    # ------ Home Config
+  # ------ Home Config
 
   tilekeeperConfig = pkgs.writeText "tilekeeper-config.toml" ''
     [tilekeeper]
@@ -812,7 +820,7 @@ let
   # ------ Custom Scripts
 
   rama = {
-    script = {  
+    script = {
       waybarBluetooth = pkgs.writeShellScriptBin "rama-waybar-bluetooth" ''
         if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
           printf '{"text":"bt:1","class":"bt-on"}'
@@ -899,16 +907,16 @@ let
     app = {
       jaiba = pkgs.rustPlatform.buildRustPackage rec {
         pname = "jaiba";
-        version = "2026.7";
+        version = "2026.8";
 
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "jaiba";
-          rev = "cbe20990c31e441b00977de49868671e673c0e68";
-          hash = "sha256-oCdk8gB+5Siu3BNSpzhLC+mBtTJG7niomAb6MYTxJK0=";
+          rev = "179c189e7f10e382f82088d6a290d3b0b3a923ba";
+          hash = "sha256-hA2Lv1D4kA8wxvGzhhe2uUkfF1i++YD/lSGdIisG/Nw=";
         };
 
-        cargoHash = "sha256-6rlpLP5q7AtHGMyh2U7cmIt+4f40AGgg0GJiV9ODDso=";
+        cargoHash = "sha256-r5vNY65lxhSoWNGxHjEcAOxhHgnpQGj6WWXqNI/AgUU=";
         doCheck = false;
       };
 
@@ -1114,6 +1122,7 @@ let
 
       photocraft = storytoldRustDesktop {
         pname = "photocraft";
+        # 20
         version = "0.8.0";
         hash = "sha256-jjQXjLLAg1hfp9Ikw/f8TmmG7hWOa/zaxA5u2oVB+dQ=";
         cargoHash = "sha256-X5AB6CkTqlwpBSjFqNwMBvUZmYGzeFLVMlqGUscztNI=";
@@ -1126,12 +1135,12 @@ let
         cargoHash = "sha256-xn6L3VaWBzUHt5PXsDa+p6rFincXa5oB04Dcag3vAB4=";
       };
 
-      cadcraft = storytoldRustDesktop {
-        pname = "cadcraft";
-        version = "0.4.0";
-        hash = "sha256-TbJdAijdj8TqP0M4hsHyrIfPAIDp39m08DlTAWDZDis=";
-        cargoHash = "sha256-EMUJN8u+FTNvRju4Go+9Lo8uXzlm4Ou7uWE8k4JQ9NY=";
-      };
+      # cadcraft = storytoldRustDesktop {
+      #   pname = "cadcraft";
+      #   version = "0.17.0";
+      #   hash = "sha256-Yf5bRRsvQbHdqBMScBb7qmsm18c8DSqvMx48Ab2Lli0=";
+      #   cargoHash = "sha256-n7BLuz7ensk1ro4tNW1J6wqbyOPxvqeHgYftlAaDSHo=";
+      # };
 
       effectcraft = storytoldRustDesktop {
         pname = "effectcraft";
@@ -1283,7 +1292,7 @@ let
           owner = "tmux";
           repo = "tmux";
           rev = "master";
-          hash = "sha256-8iHDI0CVcJLcLIaMhgJEI0V5HZ7rKMCjYIEXNgEOrhI=";
+          hash = "sha256-pDPFeJUfxCSv4WNB9ZWmIa4C1Pcqb5zIxgRpZhFIMXs=";
         };
         nativeBuildInputs = with pkgs; [
           autoconf
@@ -1471,6 +1480,14 @@ let
 
 in
 {
+
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib
+    ];
+  };
+
   # ------ Home Config
   system.activationScripts.tilekeeperConfig = ''
     install -d -m 0755 /home/${username}/.config/tilekeeper
@@ -1479,7 +1496,7 @@ in
     chown ${username}:users \
       /home/${username}/.config/tilekeeper/config.toml
   '';
-  
+
   system.activationScripts.nixTheme = ''
     install -d -m 0755 /home/${username}/.config/rama/themes
     install -m 0644 ${nixTheme} /home/${username}/.config/rama/themes/nixos.toml
@@ -1714,7 +1731,6 @@ in
 
     # tilekeeper
     exec tilekeeper daemon
-    bindsym $mod+m nop tilekeeper swap-master
 
     exec udiskie
     exec waybar --config /etc/waybar/config --style /etc/waybar/style.css
@@ -1753,18 +1769,6 @@ in
     gaps inner ${theme.spacing.md}
     gaps outer ${theme.spacing.sm}
 
-    # Terminal
-    bindsym $mod+z exec foot
-
-    # Application launcher
-    bindsym $mod+space exec rama-coqui-launch
-
-    # Close window
-    bindsym $mod+x kill
-
-    # Reload Sway
-    bindsym $mod+r reload
-
     # Floating Terminals
     for_window [app_id="floating-terminal"] floating enable, resize set width 350px height 400px, move position center
 
@@ -1777,27 +1781,29 @@ in
 
     ${workspaceBindings}
 
-    # Resizing
+    bindsym $mod+m nop tilekeeper swap-master
+    bindsym $mod+z exec foot
+    bindsym $mod+space exec rama-coqui-launch
+    bindsym $mod+x kill
+    bindsym $mod+r reload
     bindsym $mod+comma resize shrink width 1 ppt
     bindsym $mod+period resize grow width 1 ppt
+    bindsym $mod+s exec grim -g "$(slurp)" - | wl-copy
+
+    bindsym $mod+Up exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 1%+
+    bindsym $mod+Down exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 1%-
+
+    bindsym $mod+Left exec brightnessctl set 1%-
+    bindsym $mod+Right exec brightnessctl set 1%+
 
     # Volume
     bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-    bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
-    bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
 
     # Microphone
     bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
-    # Brightness
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 1%-
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 1%+
-
     # Touchpad toggle
     bindsym --locked XF86TouchpadToggle exec rama-toggle-signals
-
-    # Screenshot
-    bindsym Print exec grim -g "$(slurp)" - | wl-copy
   '';
 
   environment.etc."swaynag/config".text = ''
@@ -2098,8 +2104,37 @@ in
 ";
     };
 
+    shellInit = ''
+      export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"
+    '';
+
     promptInit = ''
       ${bashColorInit}
+
+      android_api4() {
+        qemu-system-i386 \
+          -enable-kvm \
+          -machine pc \
+          -cpu qemu32 \
+          -smp 1 \
+          -m 512 \
+          -drive file=/home/iqra/VirtualMachines/android_4/disk/android.qcow2,format=qcow2,if=ide \
+          -boot order=c \
+          -vga std \
+          -display gtk,grab-on-hover=off \
+          -netdev user,id=net0,hostfwd=tcp:127.0.0.1:4444-:5555 \
+          -device e1000,netdev=net0 \
+          -drive if=none,id=usbstick,format=raw,file=/home/iqra/android-usb.img \
+          -device usb-ehci,id=ehci \
+          -device usb-storage,bus=ehci.0,drive=usbstick
+      }
+
+      android_api4_transfer_sync() {
+        sudo mount -o loop ~/android-usb.img /tmp/android-usb
+        sudo cp ~/android-transfer/*.apk /tmp/android-usb/
+        sync
+        sudo umount /tmp/android-usb
+      }
 
       cm() {
         GIT_AUTHOR_DATE="1986-11-18T01:00:00" GIT_COMMITTER_DATE="1986-11-18T01:00:00" git commit -m "V$1"

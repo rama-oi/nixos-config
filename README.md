@@ -114,7 +114,6 @@ update = "clear && sudo nixos-rebuild switch";
 
 This lets me simply run `update` from the terminal instead of typing the full rebuild command every time.
 
-
 ### Desktop Entries
 
 The idea here is that I want to be able to open TUIs with a single click. I'm wrapping everything with **Alacritty** (my default terminal), which lets me launch these applications from **Wofi** or by clicking icons in **Waybar**.
