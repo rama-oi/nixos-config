@@ -35,6 +35,9 @@ let
 
   username = "iqra";
 
+  iqraName = "iqra";
+  iqraPort = 80;
+
   bashColors = {
     RESET = "0";
     BOLD = "1";
@@ -480,6 +483,11 @@ let
     [[command]]
     label = "Github"
     cmd = "github-desktop"
+    description = ""
+
+    [[command]]
+    label = "Iqra"
+    cmd = "brave http://${iqraName}"
     description = ""
 
     [[command]]
@@ -960,6 +968,34 @@ let
         };
 
         cargoHash = "sha256-Bhul97WcC/Pbu0QixOG5XytoW5nrqy9efYOX1xox3AI=";
+        doCheck = false;
+      };
+
+      iqra = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "iqra";
+        version = "0.1.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rama-oi";
+          repo = "iqra";
+          rev = "43255c12ea5a2ddfeef6fc79348211b5f51160d6";
+          hash = "sha256-pmZiNQCamItNGsZ+7B9YagkCN+TZCbeEBu9TX7NH25k=";
+        };
+
+        sourceRoot = "${src.name}/backend";
+
+        # Every dependency is a plain crates.io crate, so the lock file is all Nix needs:
+        # no cargoHash to recompute. (Reading it from `src` is import-from-derivation.)
+        cargoLock.lockFile = "${src}/backend/Cargo.lock";
+
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+        ];
+
+        buildInputs = with pkgs; [
+          zlib
+        ];
+
         doCheck = false;
       };
 
@@ -1550,6 +1586,8 @@ in
 
   # ------ Boot :: GRUB
   boot = {
+    kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = 80;
+
     loader = {
       systemd-boot.enable = false;
 
@@ -1583,6 +1621,7 @@ in
 
   networking = {
     hostName = username;
+    hosts."127.0.0.1" = [ iqraName ];
     networkmanager.enable = false;
     wireless.iwd.enable = true;
   };
@@ -2067,6 +2106,33 @@ in
     normal = { family = "${theme.font.family}" }
     size = ${theme.font.size}
   '';
+
+  # ------ Services :: Iqra
+  systemd.user.services.iqra = {
+    description = "Iqra git client";
+    wantedBy = [ "default.target" ];
+
+    path = with pkgs; [
+      git
+      openssh
+    ];
+
+    environment = {
+      IQRA_HOST = "127.0.0.1"; # no login yet: keep it on this machine
+      IQRA_PORT = toString iqraPort;
+      IQRA_ALLOWED_HOSTS = iqraName; # the service only answers to names it is told about
+      # IQRA_CLONE_DIR = "/home/${username}/Projects"; # where new clones go (this is the default)
+      # SSH_AUTH_SOCK = "%t/ssh-agent"; # with programs.ssh.startAgent = true, for passphrase-protected keys
+    };
+
+    serviceConfig = {
+      ExecStart = "${rama.app.iqra}/bin/iqra";
+      Restart = "on-failure";
+      RestartSec = 2;
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+    };
+  };
 
   # ------ Services :: Docker
 
