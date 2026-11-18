@@ -978,14 +978,12 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "iqra";
-          rev = "43255c12ea5a2ddfeef6fc79348211b5f51160d6";
-          hash = "sha256-pmZiNQCamItNGsZ+7B9YagkCN+TZCbeEBu9TX7NH25k=";
+          rev = "b5bf05619f62a41e14708c549f8ac92ab1201688";
+          hash = "sha256-WhzIRr0lDSezcrOnJyX4R3PXtZfWJns3lY8qeIW+nOg=";
         };
 
         sourceRoot = "${src.name}/backend";
 
-        # Every dependency is a plain crates.io crate, so the lock file is all Nix needs:
-        # no cargoHash to recompute. (Reading it from `src` is import-from-derivation.)
         cargoLock.lockFile = "${src}/backend/Cargo.lock";
 
         nativeBuildInputs = with pkgs; [
@@ -2130,7 +2128,7 @@ in
       Restart = "on-failure";
       RestartSec = 2;
       NoNewPrivileges = true;
-      PrivateTmp = true;
+      # PrivateTmp = true;
     };
   };
 
