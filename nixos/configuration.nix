@@ -165,6 +165,7 @@ let
       mc
       mousepad
       rama.appGo.tilekeeper
+      rama.appRust.favnyr
     ];
 
     themes = with pkgs; [
@@ -415,6 +416,11 @@ let
     [[command]]
     label = "Nemo"
     cmd = "nemo"
+    description = ""
+
+    [[command]]
+    label = "File Manager"
+    cmd = "favnyr"
     description = ""
 
     [[command]]
@@ -978,8 +984,8 @@ let
         src = pkgs.fetchFromGitHub {
           owner = "rama-oi";
           repo = "iqra";
-          rev = "b5bf05619f62a41e14708c549f8ac92ab1201688";
-          hash = "sha256-WhzIRr0lDSezcrOnJyX4R3PXtZfWJns3lY8qeIW+nOg=";
+          rev = "647d93ff90533451b958a653b6152ee03aa7ed70";
+          hash = "sha256-2PEUCdN9dFZQIGW1h8Gb9oKYYpTIFh1Hcztwf5HWTOM=";
         };
 
         sourceRoot = "${src.name}/backend";
@@ -1079,6 +1085,56 @@ let
     };
 
     appRust = {
+
+      favnyr = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "Favnyr";
+        version = "v0.3.8";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "GlitchAwakened";
+          repo = "Favnyr";
+          rev = "33e0e446d7a0dec43d3bfacd295abfae4b87afeb";
+          hash = "sha256-VunQJzUGdnCmIWPg6IW7WHSwcfwBD+QDf1Dz8urdsKI=";
+        };
+
+        cargoHash = "sha256-bLZSH3B7Iyb1h9aUocthBjXSxv1ZWivdyXwbSxhhjkk=";
+
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+          autoPatchelfHook
+          makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          fontconfig
+          wayland
+          libxkbcommon
+          libGL
+          stdenv.cc.cc.lib
+        ];
+
+        postInstall = ''
+          wrapProgram $out/bin/favnyr \
+            --prefix PATH : ${
+              pkgs.lib.makeBinPath [
+                pkgs.p7zip
+                pkgs.poppler-utils
+              ]
+            } \
+            --prefix LD_LIBRARY_PATH : ${
+              pkgs.lib.makeLibraryPath [
+                pkgs.wayland
+                pkgs.libxkbcommon
+                pkgs.libGL
+                pkgs.fontconfig
+                pkgs.stdenv.cc.cc.lib
+              ]
+            }
+        '';
+
+        doCheck = false;
+      };
+
       impala = pkgs.rustPlatform.buildRustPackage rec {
         pname = "impala";
         version = "v0.8.0";
@@ -2211,7 +2267,7 @@ in
         wf-recorder -o eDP-1 -f "$HOME/Videos/screen-$timestamp.mp4"
       }
 
-      update() {
+      nxu() {
         clear
 
         current_generation=$(readlink /nix/var/nix/profiles/system | sed -E 's/[^-]*-([0-9]+)-link/\1/')
@@ -2235,6 +2291,16 @@ in
         nohup waybar --config /etc/waybar/config --style /etc/waybar/style.css >/dev/null 2>&1 &
 
         printf '%b\n' "''${LIGHTBLUE}Desktop reloaded.''${RESET}"
+      }
+
+      nxc() {
+        clear
+        sudo nix-collect-garbage -d
+      }
+
+      nxo() {
+        clear
+        sudo nix-store --optimise
       }
 
       DIR="''${BOLD}''${LIGHTGREEN}"
